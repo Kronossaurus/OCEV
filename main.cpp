@@ -15,6 +15,34 @@ bitset<POPSIZE> popbin[POPSIZE];
 vector<int>     popint[POPSIZE];
 vector<double>  popdou[POPSIZE];
 
+int bAlternados(int i, char tipo){
+    int fitness=0;
+    if(tipo == 'b'){
+        for(int j=0; j<POPSIZE-1; j++){
+            if(popbin[i][j] != popbin[i][j+1])
+                fitness++;
+        }
+    }
+    else if(tipo == 'i'){
+        for(int j=0; j<POPSIZE-1; j++){
+            // printf("\n%d %d\n", popint[i][j]%2, popint[i][j+1]%2);
+            if(popint[i][j]%2 != popint[i][j+1]%2)
+                fitness++;
+        }
+    }
+    else
+        printf("Tipo incorreto\n");
+    return fitness;
+}
+
+double x2(int i){
+    double fitness=0;
+    for(int j=0; j<POPSIZE-1; j++){
+        fitness += popdou[i][j]*popdou[i][j];
+    }
+    return fitness;
+}
+
 int main(int argc, char **argv){
     if(argc != 2){
         printf("Wrong Parameters\n");
@@ -30,7 +58,9 @@ int main(int argc, char **argv){
                     popbin[i].reset(j);
                 else
                     popbin[i].set(j);
+                printf(" %d", (int)popbin[i][j]);
             }
+            printf(" Fit = %d\n",bAlternados(i, type));
         }
     }
     else if(type == 'i'){
@@ -38,11 +68,14 @@ int main(int argc, char **argv){
         for(int i=0; i<POPSIZE; i++){
             for(int j=0; j<ENCSIZE; j++){
                 temp = rand()%(RANGESUP - RANGEINF) + RANGEINF;
-                if(find(popint[i].begin(), popint[i].end(), temp) == popint[i].end())
+                if(find(popint[i].begin(), popint[i].end(), temp) == popint[i].end()){
                     popint[i].push_back(temp);
+                    printf(" %d", popint[i][j]);
+                }
                 else
                     j--;
             }
+            printf(" Fit = %d\n",bAlternados(i, type));
         }
     }
     else{ //type == 'r'
@@ -51,9 +84,9 @@ int main(int argc, char **argv){
         for(int i=0; i<POPSIZE; i++){
             for(int j=0; j<ENCSIZE; j++){
                 popdou[i].push_back(distribution(generator));
-                //printf(" %lf", popdou[i][j]);
+                printf(" %lf", popdou[i][j]);
             }
-            //printf("\n");
+            printf(" Fit = %lf\n",x2(i));
         }
     }
     return 0;
