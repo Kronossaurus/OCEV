@@ -10,10 +10,14 @@ using namespace std;
 #define POPSIZE 10
 #define RANGEINF 0
 #define RANGESUP 10
+#define MUTATERT 5
 
 bitset<POPSIZE> popbin[POPSIZE];
 vector<int>     popint[POPSIZE];
 vector<double>  popdou[POPSIZE];
+
+default_random_engine generator;
+uniform_real_distribution<double> distribution(RANGEINF, RANGESUP);
 
 int bAlternados(int i, char tipo){
     int fitness=0;
@@ -41,6 +45,37 @@ double x2(int i){
         fitness += popdou[i][j]*popdou[i][j];
     }
     return fitness;
+}
+
+void mutation(char type){
+    if(type == 'b'){
+        for(int i=0; i<POPSIZE; i++){
+            for (int j = 0; j<ENCSIZE; j++)
+            {
+                if(rand()%101 < MUTATERT)
+                    popbin[i].flip(j);
+            }
+        }
+    }
+    if(type == 'i'){
+        for(int i=0; i<POPSIZE; i++){
+            for (int j = 0; j<ENCSIZE; j++)
+            {
+                if(rand()%101 < MUTATERT){
+                    //popint[i][j] = ;//random permutation
+                }
+            }
+        }
+    }
+    else{
+        for(int i=0; i<POPSIZE; i++){
+            for (int j = 0; j<ENCSIZE; j++)
+            {
+                if(rand()%101 < MUTATERT)
+                    popdou[i][j] = distribution(generator);
+            }
+        }
+    }
 }
 
 int main(int argc, char **argv){
@@ -79,8 +114,6 @@ int main(int argc, char **argv){
         }
     }
     else{ //type == 'r'
-        default_random_engine generator;
-        uniform_real_distribution<double> distribution(RANGEINF, RANGESUP);
         for(int i=0; i<POPSIZE; i++){
             for(int j=0; j<ENCSIZE; j++){
                 popdou[i].push_back(distribution(generator));
