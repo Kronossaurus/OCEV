@@ -59,12 +59,12 @@ void mutation(char type){
     }
     if(type == 'i'){
         for(int i=0; i<POPSIZE; i++){
-            for (int j = 0; j<ENCSIZE; j++)
-            {
+            for(auto j=popint[i].begin(); j<popint[i].end(); j++){
                 if(rand()%101 < MUTATERT){
+                    popint[i].erase(j);
                     int temp = rand()%(RANGESUP - RANGEINF) + RANGEINF;
                     if(find(popint[i].begin(), popint[i].end(), temp) == popint[i].end()){
-                        popint[i][j] = temp;
+                        popint[i].insert(j, temp);
                     }
                 }
             }
