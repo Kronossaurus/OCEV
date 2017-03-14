@@ -62,7 +62,10 @@ void mutation(char type){
             for (int j = 0; j<ENCSIZE; j++)
             {
                 if(rand()%101 < MUTATERT){
-                    //popint[i][j] = ;//random permutation
+                    int temp = rand()%(RANGESUP - RANGEINF) + RANGEINF;
+                    if(find(popint[i].begin(), popint[i].end(), temp) == popint[i].end()){
+                        popint[i][j] = temp;
+                    }
                 }
             }
         }
