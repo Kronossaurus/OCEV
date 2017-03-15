@@ -61,7 +61,6 @@ void mutation(char type){
         for(int i=0; i<POPSIZE; i++){
             for(auto j=popint[i].begin(); j<popint[i].end(); j++){
                 if(rand()%101 < MUTATERT){
-                    popint[i].erase(j);
                     int temp = rand()%(RANGESUP - RANGEINF) + RANGEINF;
                     if(find(popint[i].begin(), popint[i].end(), temp) == popint[i].end()){
                         popint[i].insert(j, temp);
