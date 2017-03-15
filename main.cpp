@@ -3,7 +3,10 @@
 #include <vector>
 #include <algorithm>
 #include <random>
-using namespace std;
+using std::bitset;
+using std::vector;
+using std::default_random_engine;
+using std::uniform_real_distribution;
 
 //Extra Parameters
 #define ENCSIZE 10
