@@ -80,6 +80,37 @@ void mutation(char type){
     }
 }
 
+void printGen(char tipo){
+    switch(tipo){
+        case 'b':
+            for(int i=0; i<POPSIZE; i++){
+                for(int j=0; j<ENCSIZE; j++){
+                    printf(" %d", (int)popbin[i][j]);
+                }
+                printf("\n");
+            }
+        break;
+
+        case 'i':
+            for(int i=0; i<POPSIZE; i++){
+                for(int j=0; j<ENCSIZE; j++){
+                    printf(" %d", popint[i][j]);
+                }
+                printf("\n");
+            }
+        break;
+
+        case 'r':
+            for(int i=0; i<POPSIZE; i++){
+                for(int j=0; j<ENCSIZE; j++){
+                    printf(" %lf", popdou[i][j]);
+                }
+                printf("\n");
+            }
+        break;
+    }
+}
+
 int main(int argc, char **argv){
     if(argc != 2){
         printf("Wrong Parameters\n");
