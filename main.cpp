@@ -53,14 +53,13 @@ double x2(int i){
 void mutation(char type){
     if(type == 'b'){
         for(int i=0; i<POPSIZE; i++){
-            for (int j = 0; j<ENCSIZE; j++)
-            {
+            for (int j = 0; j<ENCSIZE; j++){
                 if(rand()%101 < MUTATERT)
                     popbin[i].flip(j);
             }
         }
     }
-    if(type == 'i'){
+    else if(type == 'i'){
         for(int i=0; i<POPSIZE; i++){
             for(auto j=popint[i].begin(); j<popint[i].end(); j++){
                 if(rand()%101 < MUTATERT){
@@ -83,6 +82,23 @@ void mutation(char type){
     }
 }
 
+void* crossover(char tipo, int i, int j){
+    int corte = rand()%(ENCSIZE-1);
+    if(tipo == 'b'){
+        for(int k=0; k<ENCSIZE; k++){
+            if(k<=corte)
+                //aux[k] = popbin[i][k];
+            else
+                //aux[k] = popbin[j][k];
+        }
+        //return aux;
+    }
+    else if(tipo == 'i'){
+    }
+    else{
+    }
+}
+
 void printGen(char tipo){
     switch(tipo){
         case 'b':
@@ -90,7 +106,7 @@ void printGen(char tipo){
                 for(int j=0; j<ENCSIZE; j++){
                     printf(" %d", (int)popbin[i][j]);
                 }
-                printf("\n");
+                printf(" Fit = %d\n",bAlternados(i, tipo));
             }
         break;
 
@@ -99,7 +115,7 @@ void printGen(char tipo){
                 for(int j=0; j<ENCSIZE; j++){
                     printf(" %d", popint[i][j]);
                 }
-                printf("\n");
+                printf(" Fit = %d\n",bAlternados(i, tipo));
             }
         break;
 
@@ -108,7 +124,7 @@ void printGen(char tipo){
                 for(int j=0; j<ENCSIZE; j++){
                     printf(" %lf", popdou[i][j]);
                 }
-                printf("\n");
+                printf(" Fit = %lf\n",x2(i));
             }
         break;
     }
@@ -129,9 +145,7 @@ int main(int argc, char **argv){
                     popbin[i].reset(j);
                 else
                     popbin[i].set(j);
-                printf(" %d", (int)popbin[i][j]);
             }
-            printf(" Fit = %d\n",bAlternados(i, type));
         }
     }
     else if(type == 'i'){
@@ -141,22 +155,22 @@ int main(int argc, char **argv){
                 temp = rand()%(RANGESUP - RANGEINF) + RANGEINF;
                 if(find(popint[i].begin(), popint[i].end(), temp) == popint[i].end()){
                     popint[i].push_back(temp);
-                    printf(" %d", popint[i][j]);
                 }
                 else
                     j--;
             }
-            printf(" Fit = %d\n",bAlternados(i, type));
         }
     }
     else{ //type == 'r'
         for(int i=0; i<POPSIZE; i++){
             for(int j=0; j<ENCSIZE; j++){
                 popdou[i].push_back(distribution(generator));
-                printf(" %lf", popdou[i][j]);
             }
-            printf(" Fit = %lf\n",x2(i));
         }
     }
+    printGen(type);
+    printf("After Mutation:\n");
+    mutation(type);
+    printGen(type);
     return 0;
 }
