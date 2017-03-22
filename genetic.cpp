@@ -35,6 +35,27 @@ double x2(int i){
     return fitness;
 }
 
+double customFunc1(int i){
+    double scale = -2 + ((2+2)/(pow(2,ENCSIZE)-1))*binToDec(i);
+    printf(" binToDec: %d, scale: %lf ", binToDec(i), scale);
+    double fx = cos(20*scale) - fabs(scale)/2 + scale*scale*scale/4;
+	
+    int precision = 4;
+    char buf[256];
+    sprintf(buf, "%.*lf", precision, fx);
+    fx = atof(buf);
+    // printf(" precision: %lf\n", fx);
+	return fx + 4;
+}
+
+int binToDec(int i){
+	int sum=0;
+	for(int j=0; j<ENCSIZE; j++){
+		sum += popbin[i][j]*pow(2, ENCSIZE-j-1);
+	}
+	return sum;
+}
+
 void mutation(char type){
     if(type == 'b'){
         for(int i=0; i<POPSIZE; i++){
@@ -93,7 +114,11 @@ void printGen(char tipo){
                 for(int j=0; j<ENCSIZE; j++){
                     printf(" %d", (int)popbin[i][j]);
                 }
-                printf(" Fit = %d\n",bAlternados(i, tipo));
+                // printf(" Fit = %d\n",bAlternados(i, tipo));
+
+                //Aula 22/mar/17
+                printf(" Fit = %lf\n",customFunc1(i));
+                //end Aula
             }
         break;
 

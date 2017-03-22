@@ -10,8 +10,8 @@ int main(int argc, char **argv){
     srand(time(NULL));
     init(type);
     printGen(type);
-    printf("After Mutation:\n");
-    mutation(type);
-    printGen(type);
+    // printf("After Mutation:\n");
+    // mutation(type);
+    // printGen(type);
     return 0;
 }

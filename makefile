@@ -1,2 +1,2 @@
 all:
-	g++ -Wall main.cpp -o main -std=c++11 genetic.cpp
+	g++ -Wall main.cpp -o main -std=c++11 -lm genetic.cpp
