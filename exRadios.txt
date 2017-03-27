@@ -1,0 +1,26 @@
+Variáveis:
+	st = [0..24]
+	lx = [0..16] //lx = [0..32]
+
+Restrição de homens:
+	st + 2*lx <= 40 //st + lx <= 40
+
+Função objetivo:
+	fo = 30*st + 40*lx //fo = 30*st + 40/2*lx
+
+Número de bits necessários:
+	st 25 valores possíveis = 5 bits = 32 genes possíveis, ajuste de escala é necessário
+	lx 17 valores possíveis = 5 bits = 32 genes possíveis, ajuste de escala é necessário // lx 33 = 6 bits = 64 genes possíveis
+
+Função objetivo normalizada:
+	fon = (30*st + 40*lx)/1360 //fon = (30st + 40/2*lx)/1360
+
+Penalidade caso a restrição não seja atingida:
+	h = max(0, st + 2*lx - 40) //fon = max(0, st + 2*lx - 40)
+
+h normalizado:
+	h = (st + 2*lx - 40)/16 //h = (st + lx - 40)/16
+
+Fitness:
+	fon + r*hn
+	r é coeficiente de penalidade, depende do problema e da existência ou não de normalização
