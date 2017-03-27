@@ -157,6 +157,10 @@ void init(char tipo){
     else if(tipo == 'i'){
         popint = (vector<int>*)malloc(sizeof(vector<int>)*POPSIZE);
         int temp;
+        if(RANGESUP - RANGEINF < ENCSIZE){//< because mutation often needs an open space, could be <=
+            printf("Insufficient range\n");
+            exit(0);
+        }
         for(int i=0; i<POPSIZE; i++){
             for(int j=0; j<ENCSIZE; j++){
                 temp = rand()%(RANGESUP - RANGEINF) + RANGEINF;
