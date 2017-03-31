@@ -15,7 +15,7 @@ using std::uniform_real_distribution;
 #define ENCSIZE 16
 #define POPSIZE 10
 #define RANGEINF -2
-#define RANGESUP 2
+#define RANGESUP 20
 #define MUTATERT 5
 
 // Fitness Functions
@@ -29,5 +29,6 @@ void crossover(char tipo, int i, int j);
 void printGen(char tipo);
 void init(char tipo);
 int binToDec(int i);
+void roulette(char tipo);
 
 #endif

@@ -1,11 +1,12 @@
 #include "genetic.h"
 
-bitset<ENCSIZE> *popbin;
-vector<int>     *popint;
-vector<double>  *popdou;
+bitset<ENCSIZE> *popbin, *popbInt;//current and intermediate populations
+vector<int>     *popint, *popiInt;
+vector<double>  *popdou, *popdint;
 
 default_random_engine generator;
 uniform_real_distribution<double> distribution(RANGEINF, RANGESUP);
+uniform_real_distribution<double> percentage(0, 100);
 
 int bAlternados(int i, char tipo){
     int fitness=0;
@@ -104,6 +105,53 @@ void crossover(char tipo, int i, int j){
     else if(tipo == 'i'){
     }
     else{
+    }
+}
+
+void roulette(char tipo){
+    int sum=0, fit[POPSIZE];
+    double fstpercentages[POPSIZE], sndpercentages[POPSIZE];
+
+    if(tipo == 'b'){
+        for(int i=0; i<POPSIZE; i++){
+            fit[i] = customFunc1(i);
+            sum += fit[i];
+        }
+        for(int i=0; i<POPSIZE; i++){
+            fstpercentages[i] = (double)fit[i]/sum;
+        }
+        if(popbInt == NULL){
+            popbInt = (bitset<ENCSIZE>*)malloc(sizeof(bitset<ENCSIZE>)*POPSIZE);
+        }
+
+        //roleta
+        for(int i=0; i<POPSIZE; i++){
+            int accum=0;
+            double random = percentage(generator);
+            int lastj;
+            int sum2=0;
+            if(i%2 == 1){
+                for(int k=0; k<POPSIZE; k++){
+                    sum += fit[i];
+                }
+                sum -= fit[i-1];
+                for(int k2=0; k2<POPSIZE; k2++){
+                    sndpercentages[k2] = k2==lastj? 0 : (double)fit[i]/sum2;
+                }
+            }
+            for(int j=0; j<POPSIZE; j++){
+                accum += i%2==0? fstpercentages[i] : sndpercentages[i];
+                if(random < accum){
+                    popbInt[i] = popbin[j];
+                    lastj = j;
+                }
+            }
+        }
+    }
+    else if(tipo == 'i'){
+        
+    }
+    else{//tipo == 'r'
     }
 }
 
