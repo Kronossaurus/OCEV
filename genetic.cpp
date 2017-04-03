@@ -205,13 +205,13 @@ void init(char tipo){
     else if(tipo == 'i'){
         popint = (vector<int>*)malloc(sizeof(vector<int>)*POPSIZE);
         int temp;
-        if(RANGESUP - RANGEINF <= ENCSIZE){
+        if(RANGESUP - RANGEINF + 1 < ENCSIZE){
             printf("Insufficient range\n");
             exit(0);
         }
         for(int i=0; i<POPSIZE; i++){
             for(int j=0; j<ENCSIZE; j++){
-                temp = rand()%(RANGESUP - RANGEINF) + RANGEINF;
+                temp = rand()%(RANGESUP - RANGEINF + 1) + RANGEINF;
                 if(find(popint[i].begin(), popint[i].end(), temp) == popint[i].end()){
                     popint[i].push_back(temp);
                 }
