@@ -205,7 +205,7 @@ void init(char tipo){
     else if(tipo == 'i'){
         popint = (vector<int>*)malloc(sizeof(vector<int>)*POPSIZE);
         int temp;
-        if(RANGESUP - RANGEINF < ENCSIZE){//< because mutation often needs an open space, could be <=
+        if(RANGESUP - RANGEINF <= ENCSIZE){
             printf("Insufficient range\n");
             exit(0);
         }
