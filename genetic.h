@@ -25,8 +25,9 @@ double customFunc1(int i);
 
 
 void mutation(char type);
-void crossover(char tipo, int i, int j);
+void crossover(char tipo);
 void printGen(char tipo);
+void printInt(char tipo);
 void init(char tipo);
 int binToDec(int i);
 void roulette(char tipo);

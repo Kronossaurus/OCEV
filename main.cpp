@@ -10,6 +10,12 @@ int main(int argc, char **argv){
     srand(time(NULL));
     init(type);
     printGen(type);
+    printf("After Roulette:\n");
+    roulette(type);
+    printInt(type);
+    crossover(type);
+    printf("After Crossover:\n");
+    printGen(type);
     // printf("After Mutation:\n");
     // mutation(type);
     // printGen(type);

@@ -38,7 +38,7 @@ double x2(int i){
 
 double customFunc1(int i){
     double scale = -2 + ((2+2)/(pow(2,ENCSIZE)-1))*binToDec(i);
-    printf(" binToDec: %d, scale: %lf ", binToDec(i), scale);
+    // printf(" binToDec: %d, scale: %lf ", binToDec(i), scale);
     double fx = cos(20*scale) - fabs(scale)/2 + scale*scale*scale/4;
 	
     int precision = 4;
@@ -89,18 +89,22 @@ void mutation(char type){
     }
 }
 
-void crossover(char tipo, int i, int j){
-    int corte = rand()%(ENCSIZE-1);
+void crossover(char tipo){
+    int corte = rand()%(ENCSIZE-1) + 1;
     if(tipo == 'b'){
-        for(int k=0; k<ENCSIZE; k++){
-            if(k<=corte){
-                //aux[k] = popbin[i][k];
-            }
-            else{
-                //aux[k] = popbin[j][k];
+        for(int i=0; i<POPSIZE; i+=2){
+            for(int j=0; j<ENCSIZE; j++){
+                // printf("%d, %d, %d\n", corte, i, j);
+                if(j<corte){
+                    popbin[i][j] = popbInt[i][j];
+                    popbin[i+1][j] = popbInt[i+1][j+corte];
+                }
+                else{
+                    popbin[i][j] = popbInt[i+1][j];
+                    popbInt[i+1][j] = popbInt[i][j-corte];
+                }
             }
         }
-        //return aux;
     }
     else if(tipo == 'i'){
     }
@@ -109,7 +113,7 @@ void crossover(char tipo, int i, int j){
 }
 
 void roulette(char tipo){
-    int sum=0, fit[POPSIZE];
+    double sum=0, fit[POPSIZE];
     double fstpercentages[POPSIZE], sndpercentages[POPSIZE];
 
     if(tipo == 'b'){
@@ -118,7 +122,7 @@ void roulette(char tipo){
             sum += fit[i];
         }
         for(int i=0; i<POPSIZE; i++){
-            fstpercentages[i] = (double)fit[i]/sum;
+            fstpercentages[i] = fit[i]/sum;
         }
         if(popbInt == NULL){
             popbInt = (bitset<ENCSIZE>*)malloc(sizeof(bitset<ENCSIZE>)*POPSIZE);
@@ -130,19 +134,24 @@ void roulette(char tipo){
             double random = percentage(generator);
             int lastj;
             int sum2=0;
+            //sndpercentages
             if(i%2 == 1){
                 for(int k=0; k<POPSIZE; k++){
                     sum += fit[i];
                 }
                 sum -= fit[i-1];
                 for(int k2=0; k2<POPSIZE; k2++){
-                    sndpercentages[k2] = k2==lastj? 0 : (double)fit[i]/sum2;
+                    sndpercentages[k2] = k2==lastj? 0 : fit[i]/sum2;
                 }
             }
+
             for(int j=0; j<POPSIZE; j++){
                 accum += i%2==0? fstpercentages[i] : sndpercentages[i];
                 if(random < accum){
-                    popbInt[i] = popbin[j];
+                    for (int k=0; k < ENCSIZE; ++k)// popbInt[i] = popbin[j];
+                    {
+                        popbInt[i][k] = popbin[j][k];
+                    }
                     lastj = j;
                 }
             }
@@ -185,6 +194,41 @@ void printGen(char tipo){
                     printf(" %lf", popdou[i][j]);
                 }
                 printf(" Fit = %lf\n",x2(i));
+            }
+        break;
+    }
+}
+
+void printInt(char tipo){
+    switch(tipo){
+        case 'b':
+            for(int i=0; i<POPSIZE; i++){
+                for(int j=0; j<ENCSIZE; j++){
+                    printf(" %d", (int)popbInt[i][j]);
+                }
+                printf("\n");
+                // printf(" Fit = %d\n",bAlternados(i, tipo));
+                // printf(" Fit = %lf\n",customFunc1(i));
+            }
+        break;
+
+        case 'i':
+            for(int i=0; i<POPSIZE; i++){
+                for(int j=0; j<ENCSIZE; j++){
+                    printf(" %d", popiInt[i][j]);
+                }
+                printf("\n");
+                // printf(" Fit = %d\n",bAlternados(i, tipo));
+            }
+        break;
+
+        case 'r':
+            for(int i=0; i<POPSIZE; i++){
+                for(int j=0; j<ENCSIZE; j++){
+                    printf(" %lf", popdint[i][j]);
+                }
+                printf("\n");
+                // printf(" Fit = %lf\n",x2(i));
             }
         break;
     }
