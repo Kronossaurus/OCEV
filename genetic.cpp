@@ -1,10 +1,12 @@
 #include "genetic.h"
 
-bitset<ENCSIZE> *popbin, *popbInt;//current and intermediate populations
-vector<int>     *popint, *popiInt;
-vector<double>  *popdou, *popdint;
+bitset<ENCSIZE> *popbin, *popbInt = NULL;//current and intermediate populations
+vector<int>     *popint, *popiInt = NULL;
+vector<double>  *popdou, *popdint = NULL;
 
-default_random_engine generator;
+
+unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+default_random_engine generator(seed);
 uniform_real_distribution<double> distribution(RANGEINF, RANGESUP);
 uniform_real_distribution<double> percentage(0, 100);
 
@@ -101,7 +103,7 @@ void crossover(char tipo){
                 }
                 else{
                     popbin[i][j] = popbInt[i+1][j];
-                    popbInt[i+1][j] = popbInt[i][j-corte];
+                    popbin[i+1][j] = popbInt[i][j-corte];
                 }
             }
         }
@@ -115,7 +117,6 @@ void crossover(char tipo){
 void roulette(char tipo){
     double sum=0, fit[POPSIZE];
     double fstpercentages[POPSIZE], sndpercentages[POPSIZE];
-
     if(tipo == 'b'){
         for(int i=0; i<POPSIZE; i++){
             fit[i] = customFunc1(i);
@@ -129,30 +130,28 @@ void roulette(char tipo){
         }
 
         //roleta
+        int lastj;
         for(int i=0; i<POPSIZE; i++){
-            int accum=0;
+            double accum=0;
             double random = percentage(generator);
-            int lastj;
-            int sum2=0;
+            // printf("random = %lf\n", random);
+            double sum2=0;
             //sndpercentages
             if(i%2 == 1){
-                for(int k=0; k<POPSIZE; k++){
-                    sum += fit[i];
-                }
-                sum -= fit[i-1];
+                sum2 = sum - fit[lastj];
                 for(int k2=0; k2<POPSIZE; k2++){
-                    sndpercentages[k2] = k2==lastj? 0 : fit[i]/sum2;
+                    sndpercentages[k2] = k2==lastj? 0 : fit[k2]/sum2;
                 }
             }
 
             for(int j=0; j<POPSIZE; j++){
-                accum += i%2==0? fstpercentages[i] : sndpercentages[i];
-                if(random < accum){
-                    for (int k=0; k < ENCSIZE; ++k)// popbInt[i] = popbin[j];
-                    {
-                        popbInt[i][k] = popbin[j][k];
-                    }
+                accum += i%2==0? fstpercentages[j] : sndpercentages[j];
+                // printf("accum*100 = %lf\n", accum*100);
+                if(random < accum*100){
+                    // printf("%d\n", j);
+                    popbInt[i] = popbin[j];
                     lastj = j;
+                    break;
                 }
             }
         }

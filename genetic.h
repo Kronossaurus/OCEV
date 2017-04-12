@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <random>
 #include <cmath>
+#include <chrono>
 using std::bitset;
 using std::vector;
 using std::default_random_engine;
