@@ -42,9 +42,11 @@ double x2(int i){
 }
 
 double x2_2(int i){//aula do dia 17/04
+    int j;
     double fitness=0;
     double scale = abs(RANGESUP) > abs(RANGEINF)? abs(RANGESUP) : abs(RANGEINF);
-    for(int j=0; j<ENCSIZE-1; j++){
+    // #pragma omp parallel for default(shared) private(j) reduction (+:fitness)
+    for(j=0; j<ENCSIZE-1; j++){
         fitness += scale*scale - (popdou[i][j]-2)*(popdou[i][j]-2);
     }
     return fitness/ENCSIZE;
@@ -119,7 +121,7 @@ void deltaMutation(char type){
     }
 }
 
-void crossover(char tipo){
+void crossover1p(char tipo){
     for(int i=0; i<POPSIZE; i+=2){
         if(rand()%101 < CROSSRT){
             int corte = rand()%(ENCSIZE-1) + 1;
@@ -151,6 +153,57 @@ void crossover(char tipo){
                     else{
                         popdou[i][j] = popdInt[i+1][j];
                         popdou[i+1][j] = popdInt[i][j];
+                    }
+                }
+            }
+        }
+        else{
+            if(tipo == 'b'){
+                popbin[i] = popbInt[i];
+                popbin[i+1] = popbInt[i+1];
+            }
+            else if(tipo == 'i'){
+                popint[i] = popiInt[i];
+                popint[i+1] = popiInt[i+1];
+            }
+            else{
+                popdou[i] = popdInt[i];
+                popdou[i+1] = popdInt[i+1];
+            }
+        }
+    }
+}
+
+void crossunif(char tipo){
+    for(int i=0; i<POPSIZE; i+=2){
+        if(rand()%101 < CROSSRT){
+            for(int j=0; j<ENCSIZE; j++){
+                if(rand()%2 == 0){
+                    if(tipo == 'b'){
+                        popbin[i][j] = popbInt[i+1][j];
+                        popbin[i+1][j] = popbInt[i][j];
+                    }
+                    else if(tipo == 'i'){
+                        popint[i][j] = popiInt[i+1][j];
+                        popint[i+1][j] = popiInt[i][j];
+                    }
+                    else{
+                        popdou[i][j] = popdInt[i+1][j];
+                        popdou[i+1][j] = popdInt[i][j];
+                    }
+                }
+                else{
+                    if(tipo == 'b'){
+                        popbin[i][j] = popbInt[i][j];
+                        popbin[i+1][j] = popbInt[i+1][j];
+                    }
+                    else if(tipo == 'i'){
+                        popint[i][j] = popiInt[i][j];
+                        popint[i+1][j] = popiInt[i+1][j];
+                    }
+                    else{
+                        popdou[i][j] = popdInt[i][j];
+                        popdou[i+1][j] = popdInt[i+1][j];
                     }
                 }
             }
@@ -381,17 +434,22 @@ void AG(char type){
         //selection
         // printf("Roleta\n");
         roulette(type);
+
         //crossover
         // printInt(type);
         // printf("Crossover\n");
-        crossover(type);
+        // crossover(type);
+        crossunif(type);
+
         //mutation
         // printf("Mutation\n");
         // mutation(type);
         deltaMutation(type);
+
         //fitness update
         // printf("Fitness\n");
         Fitness(type);
+
         //log
         // printf("Log\n");
         logMedias(i);

@@ -7,6 +7,7 @@
 #include <random>
 #include <cmath>
 #include <chrono>
+#include <omp.h>
 using std::bitset;
 using std::vector;
 using std::default_random_engine;
@@ -29,7 +30,8 @@ double customFunc1(int i);
 
 
 void mutation(char type);
-void crossover(char tipo);
+void crossover1p(char tipo);
+void crossunif(char tipo);
 void printGen(char tipo);
 void printInt(char tipo);
 void init(char tipo);

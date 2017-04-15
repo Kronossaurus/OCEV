@@ -1,5 +1,5 @@
 all:
-	g++ -Wall main.cpp -o main -std=c++11 -lm genetic.cpp
+	g++ -Wall main.cpp -o main -std=c++11 -lm -fopenmp genetic.cpp
 
 plot:
 	gnuplot plot.sh
