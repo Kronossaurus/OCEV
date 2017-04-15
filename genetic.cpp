@@ -35,7 +35,7 @@ int bAlternados(int i, char tipo){
 
 double x2(int i){
     double fitness=0;
-    for(int j=0; j<ENCSIZE-1; j++){
+    for(int j=0; j<ENCSIZE; j++){
         fitness += popdou[i][j]*popdou[i][j];
     }
     return fitness;
@@ -46,10 +46,10 @@ double x2_2(int i){//aula do dia 17/04
     double fitness=0;
     double scale = abs(RANGESUP) > abs(RANGEINF)? abs(RANGESUP) : abs(RANGEINF);
     // #pragma omp parallel for default(shared) private(j) reduction (+:fitness)
-    for(j=0; j<ENCSIZE-1; j++){
+    for(j=0; j<ENCSIZE; j++){
         fitness += scale*scale - (popdou[i][j]-2)*(popdou[i][j]-2);
     }
-    return fitness/ENCSIZE;
+    return fitness/ENCSIZE/scale/scale;
 }
 
 double customFunc1(int i){
