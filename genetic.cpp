@@ -3,7 +3,7 @@
 bitset<ENCSIZE> *popbin, *popbInt = NULL;//current and intermediate populations
 vector<int>     *popint, *popiInt = NULL;
 vector<double>  *popdou, *popdint = NULL;
-
+FILE *file = NULL;
 
 unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 default_random_engine generator(seed);
@@ -270,4 +270,11 @@ void init(char tipo){
             }
         }
     }
+}
+
+void logMedias(int iteration, double value){
+    if(file == NULL){
+        file = fopen("data.txt", "w");
+    }
+    fprintf(file, "%d %lf\n", iteration, value);
 }

@@ -33,4 +33,6 @@ void init(char tipo);
 int binToDec(int i);
 void roulette(char tipo);
 
+void logMedias(int iteration, double value);
+
 #endif
