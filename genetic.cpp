@@ -93,26 +93,18 @@ void mutation(char type){
 
 void crossover(char tipo){
     int corte = rand()%(ENCSIZE-1) + 1;
-    free(popbin);
-    popbin = NULL;
-    popbin = (bitset<ENCSIZE>*)malloc(sizeof(bitset<ENCSIZE>)*POPSIZE);
-    printf("%d\n", corte);
     if(tipo == 'b'){
         for(int i=0; i<POPSIZE; i+=2){
             for(int j=0; j<ENCSIZE; j++){
-                // printf("%d, %d, %d\n", corte, i, j);
                 if(j<corte){
-                    printf(" a");
                     popbin[i][j] = popbInt[i][j];
                     popbin[i+1][j] = popbInt[i+1][j];
                 }
                 else{
-                    printf(" b");
                     popbin[i][j] = popbInt[i+1][j];
                     popbin[i+1][j] = popbInt[i][j];
                 }
             }
-            printf("\n");
         }
     }
     else if(tipo == 'i'){
