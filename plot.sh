@@ -50,7 +50,5 @@ set tics nomirror
 set style func linespoints
 #set logscale y
 
-set output 'media.png'
-plot 'data.txt' using 1:2 title 'Média' with linespoints ls 1 pointsize 0.1
-set output 'maior.png'
-plot 'data.txt' using 1:3 title 'Maior' with linespoints ls 4 pointsize 0.1
+set output 'output.png'
+plot 'data.txt' using 1:2 title 'Média' with linespoints ls 1 pointsize 0, 'data.txt' using 1:3 title 'Maior' with linespoints ls 4 pointsize 0
