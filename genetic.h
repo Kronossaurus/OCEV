@@ -14,16 +14,17 @@ using std::uniform_real_distribution;
 
 //Extra Parameters
 #define ENCSIZE 10
-#define POPSIZE 500
-#define RANGEINF -2
-#define RANGESUP 4
-#define MUTATERT 1
+#define POPSIZE 2000
+#define RANGEINF -5
+#define RANGESUP 5
+#define MUTATERT 5
 #define CROSSRT 80
-#define MAXGENS 100
+#define MAXGENS 400
 
 // Fitness Functions
 int bAlternados(int i, char tipo);
 double x2(int i);
+double x2_2(int i);
 double customFunc1(int i);
 
 

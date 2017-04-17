@@ -41,6 +41,15 @@ double x2(int i){
     return fitness;
 }
 
+double x2_2(int i){//aula do dia 17/04
+    double fitness=0;
+    double scale = abs(RANGESUP) > abs(RANGEINF)? abs(RANGESUP) : abs(RANGEINF);
+    for(int j=0; j<ENCSIZE-1; j++){
+        fitness += scale*scale - (popdou[i][j]-2)*(popdou[i][j]-2);
+    }
+    return fitness/ENCSIZE;
+}
+
 double customFunc1(int i){
     double scale = -2 + ((2+2)/(pow(2,ENCSIZE)-1))*binToDec(i);
     // printf(" binToDec: %d, scale: %lf ", binToDec(i), scale);
@@ -90,6 +99,21 @@ void mutation(char type){
             {
                 if(rand()%101 < MUTATERT)
                     popdou[i][j] = distribution(generator);
+            }
+        }
+    }
+}
+
+void deltaMutation(char type){
+    if(type != 'r'){
+        printf("Wrong type for deltaMutation\n");
+        exit(0);
+    }
+    uniform_real_distribution<double> deltaDist(0, 0.2);
+    for(int i=0; i<POPSIZE; i++){
+        for(int j=0; j<ENCSIZE; j++){
+            if(rand()%101 < MUTATERT){
+                popdou[i][j] += rand()%2 == 0? deltaDist(generator) : -deltaDist(generator);
             }
         }
     }
@@ -216,7 +240,7 @@ void printGen(char tipo){
                 for(int j=0; j<ENCSIZE; j++){
                     printf(" %lf", popdou[i][j]);
                 }
-                printf(" Fit = %lf\n",x2(i));
+                printf(" Fit = %lf\n",x2_2(i));
             }
         break;
     }
@@ -331,7 +355,7 @@ void Fitness(char type){//this function fills the fit vector and the sum variabl
         }
 
         else{
-            fit[i] = x2(i);
+            fit[i] = x2_2(i);
             if(fit[i] > outFit){
                 outFit = fit[i];
                 outDou = popdou[i];
@@ -355,14 +379,21 @@ void AG(char type){
         // printGen(type);
 
         //selection
+        // printf("Roleta\n");
         roulette(type);
         //crossover
+        // printInt(type);
+        // printf("Crossover\n");
         crossover(type);
         //mutation
-        mutation(type);
+        // printf("Mutation\n");
+        // mutation(type);
+        deltaMutation(type);
         //fitness update
+        // printf("Fitness\n");
         Fitness(type);
         //log
+        // printf("Log\n");
         logMedias(i);
     }
     printf("Maior Fitness = %.4lf\n", outFit);
