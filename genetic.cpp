@@ -1,8 +1,11 @@
 #include "genetic.h"
 
-bitset<ENCSIZE> *popbin, *popbInt = NULL;//current and intermediate populations
-vector<int>     *popint, *popiInt = NULL;
-vector<double>  *popdou, *popdint = NULL;
+bitset<ENCSIZE> *popbin, *popbInt = NULL, outBin;//current and intermediate populations, output individual
+vector<int>     *popint, *popiInt = NULL, outInt;
+vector<double>  *popdou, *popdInt = NULL, outDou;
+
+//global to reduce processing complexity
+double fit[POPSIZE], sum = 0, maior = 0, outFit = 0;
 FILE *file = NULL;
 
 unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -13,13 +16,13 @@ uniform_real_distribution<double> percentage(0, 100);
 int bAlternados(int i, char tipo){
     int fitness=0;
     if(tipo == 'b'){
-        for(int j=0; j<POPSIZE-1; j++){
+        for(int j=0; j<ENCSIZE-1; j++){
             if(popbin[i][j] != popbin[i][j+1])
                 fitness++;
         }
     }
     else if(tipo == 'i'){
-        for(int j=0; j<POPSIZE-1; j++){
+        for(int j=0; j<ENCSIZE-1; j++){
             // printf("\n%d %d\n", popint[i][j]%2, popint[i][j+1]%2);
             if(popint[i][j]%2 != popint[i][j+1]%2)
                 fitness++;
@@ -32,7 +35,7 @@ int bAlternados(int i, char tipo){
 
 double x2(int i){
     double fitness=0;
-    for(int j=0; j<POPSIZE-1; j++){
+    for(int j=0; j<ENCSIZE-1; j++){
         fitness += popdou[i][j]*popdou[i][j];
     }
     return fitness;
@@ -43,10 +46,10 @@ double customFunc1(int i){
     // printf(" binToDec: %d, scale: %lf ", binToDec(i), scale);
     double fx = cos(20*scale) - fabs(scale)/2 + scale*scale*scale/4;
 	
-    int precision = 4;
-    char buf[256];
-    sprintf(buf, "%.*lf", precision, fx);
-    fx = atof(buf);
+    // int precision = 4;
+    // char buf[256];
+    // sprintf(buf, "%.*lf", precision, fx);
+    // fx = atof(buf);
     // printf(" precision: %lf\n", fx);
 	return fx + 4;
 }
@@ -70,13 +73,14 @@ void mutation(char type){
     }
     else if(type == 'i'){
         for(int i=0; i<POPSIZE; i++){
-            for(auto j=popint[i].begin(); j<popint[i].end(); j++){
-                if(rand()%101 < MUTATERT){
-                    int temp = rand()%(RANGESUP - RANGEINF) + RANGEINF;
-                    if(find(popint[i].begin(), popint[i].end(), temp) == popint[i].end()){
-                        popint[i].insert(j, temp);
-                    }
-                }
+            if(rand()%101 < MUTATERT){
+                int a = rand()%ENCSIZE, b;
+                b = a;
+                while(b==a)
+                    b = rand()%ENCSIZE;
+                int aux = popint[i][a];
+                popint[i][a] = popint[i][b];
+                popint[i][b] = aux;
             }
         }
     }
@@ -92,73 +96,94 @@ void mutation(char type){
 }
 
 void crossover(char tipo){
-    int corte = rand()%(ENCSIZE-1) + 1;
-    if(tipo == 'b'){
-        for(int i=0; i<POPSIZE; i+=2){
+    for(int i=0; i<POPSIZE; i+=2){
+        if(rand()%101 < CROSSRT){
+            int corte = rand()%(ENCSIZE-1) + 1;
             for(int j=0; j<ENCSIZE; j++){
                 if(j<corte){
-                    popbin[i][j] = popbInt[i][j];
-                    popbin[i+1][j] = popbInt[i+1][j];
+                    if(tipo == 'b'){
+                        popbin[i][j] = popbInt[i][j];
+                        popbin[i+1][j] = popbInt[i+1][j];
+                    }
+                    else if(tipo == 'i'){
+                        popint[i][j] = popiInt[i][j];
+                        popint[i+1][j] = popiInt[i+1][j];
+                    }
+                    else{
+                        popdou[i][j] = popdInt[i][j];
+                        popdou[i+1][j] = popdInt[i+1][j];
+                    }
+
                 }
                 else{
-                    popbin[i][j] = popbInt[i+1][j];
-                    popbin[i+1][j] = popbInt[i][j];
+                    if(tipo == 'b'){
+                        popbin[i][j] = popbInt[i+1][j];
+                        popbin[i+1][j] = popbInt[i][j];
+                    }
+                    else if(tipo == 'i'){
+                        popint[i][j] = popiInt[i+1][j];
+                        popint[i+1][j] = popiInt[i][j];
+                    }
+                    else{
+                        popdou[i][j] = popdInt[i+1][j];
+                        popdou[i+1][j] = popdInt[i][j];
+                    }
                 }
             }
         }
-    }
-    else if(tipo == 'i'){
-    }
-    else{
+        else{
+            if(tipo == 'b'){
+                popbin[i] = popbInt[i];
+                popbin[i+1] = popbInt[i+1];
+            }
+            else if(tipo == 'i'){
+                popint[i] = popiInt[i];
+                popint[i+1] = popiInt[i+1];
+            }
+            else{
+                popdou[i] = popdInt[i];
+                popdou[i+1] = popdInt[i+1];
+            }
+        }
     }
 }
 
 void roulette(char tipo){
-    double sum=0, fit[POPSIZE];
     double fstpercentages[POPSIZE], sndpercentages[POPSIZE];
-    if(tipo == 'b'){
-        for(int i=0; i<POPSIZE; i++){
-            fit[i] = customFunc1(i);
-            sum += fit[i];
-        }
-        for(int i=0; i<POPSIZE; i++){
-            fstpercentages[i] = fit[i]/sum;
-        }
-        if(popbInt == NULL){
-            popbInt = (bitset<ENCSIZE>*)malloc(sizeof(bitset<ENCSIZE>)*POPSIZE);
-        }
+    for(int i=0; i<POPSIZE; i++)
+        fstpercentages[i] = fit[i]/sum;
 
-        //roleta
-        int lastj;
-        for(int i=0; i<POPSIZE; i++){
-            double accum=0;
-            double random = percentage(generator);
-            // printf("random = %lf\n", random);
-            double sum2=0;
-            //sndpercentages
-            if(i%2 == 1){
-                sum2 = sum - fit[lastj];
-                for(int k2=0; k2<POPSIZE; k2++){
-                    sndpercentages[k2] = k2==lastj? 0 : fit[k2]/sum2;
-                }
+    //roleta
+    int lastj;
+    for(int i=0; i<POPSIZE; i++){
+        double accum=0;
+        double random = percentage(generator);
+        // printf("random = %lf\n", random);
+        double sum2=0;
+        //sndpercentages
+        if(i%2 == 1){
+            sum2 = sum - fit[lastj];
+            for(int k2=0; k2<POPSIZE; k2++){
+                sndpercentages[k2] = k2==lastj? 0 : fit[k2]/sum2;
             }
+        }
 
-            for(int j=0; j<POPSIZE; j++){
-                accum += i%2==0? fstpercentages[j] : sndpercentages[j];
-                // printf("accum*100 = %lf\n", accum*100);
-                if(random < accum*100){
-                    // printf("%d\n", j);
+        for(int j=0; j<POPSIZE; j++){
+            accum += i%2==0? fstpercentages[j] : sndpercentages[j];
+            // printf("accum*100 = %lf\n", accum*100);
+            if(random < accum*100){
+                // printf("%d\n", j);
+                if(tipo == 'b')
                     popbInt[i] = popbin[j];
-                    lastj = j;
-                    break;
-                }
+                else if(tipo == 'i')
+                    popiInt[i] = popint[j];
+                else
+                    popdInt[i] = popdou[j];
+
+                lastj = j;
+                break;
             }
         }
-    }
-    else if(tipo == 'i'){
-        
-    }
-    else{//tipo == 'r'
     }
 }
 
@@ -223,7 +248,7 @@ void printInt(char tipo){
         case 'r':
             for(int i=0; i<POPSIZE; i++){
                 for(int j=0; j<ENCSIZE; j++){
-                    printf(" %lf", popdint[i][j]);
+                    printf(" %lf", popdInt[i][j]);
                 }
                 printf("\n");
                 // printf(" Fit = %lf\n",x2(i));
@@ -235,6 +260,7 @@ void printInt(char tipo){
 void init(char tipo){
     if(tipo =='b'){
         popbin = (bitset<ENCSIZE>*)malloc(sizeof(bitset<ENCSIZE>)*POPSIZE);
+        popbInt = (bitset<ENCSIZE>*)malloc(sizeof(bitset<ENCSIZE>)*POPSIZE);
         for(int i=0; i<POPSIZE; i++){
             for(int j=0; j<ENCSIZE; j++){
                 if(rand()%2==0)
@@ -243,9 +269,12 @@ void init(char tipo){
                     popbin[i].set(j);
             }
         }
+        for(int i=0; i<POPSIZE; i++)
+            popbin[0][i] = 1;
     }
     else if(tipo == 'i'){
         popint = (vector<int>*)malloc(sizeof(vector<int>)*POPSIZE);
+        popiInt = (vector<int>*)malloc(sizeof(vector<int>)*POPSIZE);
         int temp;
         if(RANGESUP - RANGEINF + 1 < ENCSIZE){
             printf("Insufficient range\n");
@@ -264,6 +293,7 @@ void init(char tipo){
     }
     else{
         popdou = (vector<double>*)malloc(sizeof(vector<double>)*POPSIZE);
+        popdInt = (vector<double>*)malloc(sizeof(vector<double>)*POPSIZE);
         for(int i=0; i<POPSIZE; i++){
             for(int j=0; j<ENCSIZE; j++){
                 popdou[i].push_back(distribution(generator));
@@ -272,9 +302,81 @@ void init(char tipo){
     }
 }
 
-void logMedias(int iteration, double value){
+void logMedias(int iteration){
     if(file == NULL){
         file = fopen("data.txt", "w");
     }
-    fprintf(file, "%d %lf\n", iteration, value);
+    fprintf(file, "%d %lf %lf\n", iteration, sum/POPSIZE, maior);
+}
+
+void Fitness(char type){//this function fills the fit vector and the sum variable
+    maior = 0;
+    sum = 0;
+    for(int i=0; i<POPSIZE; i++){
+
+        if(type == 'b'){
+            fit[i] = customFunc1(i);
+            if(fit[i] > outFit){
+                outFit = fit[i];
+                outBin = popbin[i];
+            }
+        }
+
+        else if(type == 'i'){
+            fit[i] = bAlternados(i, type);
+            if(fit[i] > outFit){
+                outFit = fit[i];
+                outInt = popint[i];
+            }
+        }
+
+        else{
+            fit[i] = x2(i);
+            if(fit[i] > outFit){
+                outFit = fit[i];
+                outDou = popdou[i];
+            }
+        }
+        if(fit[i] > maior)
+            maior = fit[i];
+        sum += fit[i];
+    }
+}
+
+void AG(char type){
+    init(type);
+    //fitness update
+    Fitness(type);
+    //log
+    outFit = maior;
+    logMedias(0);
+    for(int i=1; i<=MAXGENS; i++){
+        // printf("\nGen %d: \n", i-1);
+        // printGen(type);
+
+        //selection
+        roulette(type);
+        //crossover
+        crossover(type);
+        //mutation
+        mutation(type);
+        //fitness update
+        Fitness(type);
+        //log
+        logMedias(i);
+    }
+    printf("Maior Fitness = %.4lf\n", outFit);
+    printf("Genótipo do melhor indivíduo =");
+    if(type == 'b')
+        for(int i=0; i<ENCSIZE; i++)
+            printf(" %d", (int)outBin[i]);
+    else if(type == 'i')
+        for(int i=0; i<ENCSIZE; i++){
+            printf(" %i", outInt[i]);
+        }
+    else
+        for(int i=0; i<ENCSIZE; i++){
+            printf(" %.4lf", outDou[i]);
+        }
+    printf("\n");
 }

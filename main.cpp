@@ -8,16 +8,6 @@ int main(int argc, char **argv){
     }
     char type = argv[1][0];
     srand(time(NULL));
-    init(type);
-    printGen(type);
-    printf("After Roulette:\n");
-    roulette(type);
-    printInt(type);
-    crossover(type);
-    printf("After Crossover:\n");
-    printGen(type);
-    // printf("After Mutation:\n");
-    // mutation(type);
-    // printGen(type);
+    AG(type);
     return 0;
 }

@@ -13,11 +13,13 @@ using std::default_random_engine;
 using std::uniform_real_distribution;
 
 //Extra Parameters
-#define ENCSIZE 16
-#define POPSIZE 10
+#define ENCSIZE 10
+#define POPSIZE 500
 #define RANGEINF -2
-#define RANGESUP 20
-#define MUTATERT 5
+#define RANGESUP 4
+#define MUTATERT 1
+#define CROSSRT 80
+#define MAXGENS 100
 
 // Fitness Functions
 int bAlternados(int i, char tipo);
@@ -33,6 +35,8 @@ void init(char tipo);
 int binToDec(int i);
 void roulette(char tipo);
 
-void logMedias(int iteration, double value);
+void logMedias(int iteration);
 
+void AG(char type);
+void Fitness(char type);
 #endif
