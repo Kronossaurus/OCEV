@@ -2,8 +2,6 @@
 #!/usr/bin/gnuplot
 
 set terminal pngcairo
-#file output name
-set output 'output.png'
 
 #label x
 set xlabel "Iterações"
@@ -50,5 +48,9 @@ set border 3 back ls 11
 set tics nomirror
 
 set style func linespoints
+#set logscale y
 
-plot 'data.txt' using 1:2 title 'Fitness' with linespoints ls 1 pointsize 3
+set output 'media.png'
+plot 'data.txt' using 1:2 title 'Média' with linespoints ls 1 pointsize 0.1
+set output 'maior.png'
+plot 'data.txt' using 1:3 title 'Maior' with linespoints ls 4 pointsize 0.1
