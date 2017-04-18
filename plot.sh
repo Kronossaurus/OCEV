@@ -52,3 +52,6 @@ set style func linespoints
 
 set output 'output.png'
 plot 'data.txt' using 1:2 title 'Média' with linespoints ls 1 pointsize 0, 'data.txt' using 1:3 title 'Maior' with linespoints ls 4 pointsize 0
+
+set output 'outDiversity.png'
+plot 'data.txt' using 1:4 title 'Diversidade' with linespoints ls 3 pointsize 0

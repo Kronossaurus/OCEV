@@ -29,7 +29,7 @@ int bAlternados(int i, char tipo){
         }
     }
     else
-        printf("Tipo incorreto\n");
+        printf("Tipo incorreto para bAlternados\n");
     return fitness;
 }
 
@@ -379,11 +379,26 @@ void init(char tipo){
     }
 }
 
-void logMedias(int iteration){
+void logMedias(int iteration, double div){
     if(file == NULL){
         file = fopen("data.txt", "w");
     }
-    fprintf(file, "%d %lf %lf\n", iteration, sum/POPSIZE, maior);
+    fprintf(file, "%d %lf %lf %lf\n", iteration, sum/POPSIZE, maior, div);
+}
+
+double diversity(char type){
+    double div = 0;
+    if(type == 'b'){
+        for (int i = 0; i < POPSIZE; i++){
+            for (int j = i+1; j < POPSIZE; j++){
+                for (int k = 0; k < ENCSIZE; k++){
+                    if(popbin[i][k] != popbin[j][k])
+                        div++;
+                }
+            }
+        }
+    }
+    return div/POPSIZE/POPSIZE;
 }
 
 void Fitness(char type){//this function fills the fit vector and the sum variable
@@ -392,7 +407,7 @@ void Fitness(char type){//this function fills the fit vector and the sum variabl
     for(int i=0; i<POPSIZE; i++){
 
         if(type == 'b'){
-            fit[i] = customFunc1(i);
+            fit[i] = bAlternados(i, type);
             if(fit[i] > outFit){
                 outFit = fit[i];
                 outBin = popbin[i];
@@ -426,7 +441,9 @@ void AG(char type){
     Fitness(type);
     //log
     outFit = maior;
-    logMedias(0);
+    double div = 0;
+    div = diversity(type);
+    logMedias(0, div);
     for(int i=1; i<=MAXGENS; i++){
         // printf("\nGen %d: \n", i-1);
         // printGen(type);
@@ -443,8 +460,8 @@ void AG(char type){
 
         //mutation
         // printf("Mutation\n");
-        // mutation(type);
-        deltaMutation(type);
+        mutation(type);
+        // deltaMutation(type);
 
         //fitness update
         // printf("Fitness\n");
@@ -452,7 +469,8 @@ void AG(char type){
 
         //log
         // printf("Log\n");
-        logMedias(i);
+        div = diversity(type);
+        logMedias(i, div);
     }
     printf("Maior Fitness = %.4lf\n", outFit);
     printf("Genótipo do melhor indivíduo =");
