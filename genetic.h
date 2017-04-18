@@ -14,20 +14,20 @@ using std::default_random_engine;
 using std::uniform_real_distribution;
 
 //Extra Parameters
-#define ENCSIZE 20
+#define ENCSIZE 36
 #define POPSIZE 50
 #define RANGEINF -2
 #define RANGESUP 4
-#define MUTATERT 1
-#define CROSSRT 80
-#define MAXGENS 200
+#define MUTATERT 1 //trocar pra permilagem
+#define CROSSRT 90
+#define MAXGENS 400
 
 // Fitness Functions
 int bAlternados(int i, char tipo);
 double x2(int i);
 double x2_2(int i);
 double customFunc1(int i);
-
+int pattern(int i);
 
 void mutation(char type);
 void crossover1p(char tipo);

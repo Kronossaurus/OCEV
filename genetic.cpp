@@ -65,6 +65,25 @@ double customFunc1(int i){
 	return fx + 4;
 }
 
+int pattern(int i){
+    int size = 6;
+    int goal[] = {  1, 0, 1, 1, 1, 1,
+                    1, 0, 1, 0, 0, 1,
+                    1, 0, 1, 0, 1, 1,
+                    1, 1, 1, 1, 0, 1,
+                    1, 0, 0, 0, 1, 1,
+                    1, 1, 1, 1, 0, 1 };
+
+    int dist = 0;
+    for (int j = 0; j < size*size; ++j){
+        if(goal[j] != popbin[i][j])
+            dist++;
+    }
+
+    int fitness = 36 - dist;
+    return fitness;
+}
+
 int binToDec(int i){
 	int sum=0;
 	for(int j=0; j<ENCSIZE; j++){
@@ -265,37 +284,16 @@ void roulette(char tipo){
 }
 
 void printGen(char tipo){
-    switch(tipo){
-        case 'b':
-            for(int i=0; i<POPSIZE; i++){
-                for(int j=0; j<ENCSIZE; j++){
-                    printf(" %d", (int)popbin[i][j]);
-                }
-                // printf(" Fit = %d\n",bAlternados(i, tipo));
-
-                //Aula 22/mar/17
-                printf(" Fit = %lf\n",customFunc1(i));
-                //end Aula
-            }
-        break;
-
-        case 'i':
-            for(int i=0; i<POPSIZE; i++){
-                for(int j=0; j<ENCSIZE; j++){
-                    printf(" %d", popint[i][j]);
-                }
-                printf(" Fit = %d\n",bAlternados(i, tipo));
-            }
-        break;
-
-        case 'r':
-            for(int i=0; i<POPSIZE; i++){
-                for(int j=0; j<ENCSIZE; j++){
-                    printf(" %lf", popdou[i][j]);
-                }
-                printf(" Fit = %lf\n",x2_2(i));
-            }
-        break;
+    for(int i=0; i<POPSIZE; i++){
+        for(int j=0; j<ENCSIZE; j++){
+            if(tipo == 'b')
+                printf(" %d", (int)popbin[i][j]);
+            else if(tipo == 'i')
+                printf(" %d", popint[i][j]);
+            else
+                printf(" %lf", popdou[i][j]);
+        }
+        printf(" Fit = %lf\n",fit[i]);
     }
 }
 
@@ -407,7 +405,7 @@ void Fitness(char type){//this function fills the fit vector and the sum variabl
     for(int i=0; i<POPSIZE; i++){
 
         if(type == 'b'){
-            fit[i] = bAlternados(i, type);
+            fit[i] = pattern(i);
             if(fit[i] > outFit){
                 outFit = fit[i];
                 outBin = popbin[i];
