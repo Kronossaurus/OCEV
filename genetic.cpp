@@ -84,6 +84,17 @@ int pattern(int i){
     return fitness;
 }
 
+int nDamas(int i){
+    int fitness = 0;
+    for(int j = 0; j<ENCSIZE; j++){
+        for(int k = j+1; k<ENCSIZE; k++){
+            if(k-j == abs(popint[i][j]-popbin[i][k]))
+                fitness++;
+        }
+    }
+    return ENCSIZE - fitness;
+}
+
 int binToDec(int i){
 	int sum=0;
 	for(int j=0; j<ENCSIZE; j++){
