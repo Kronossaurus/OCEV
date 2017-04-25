@@ -14,10 +14,11 @@ using std::default_random_engine;
 using std::uniform_real_distribution;
 
 //Extra Parameters
-#define ENCSIZE 8
+#define ENCSIZE 16
 #define POPSIZE 40
 #define RANGEINF 1
 #define RANGESUP ENCSIZE
+#define ELITISM 1
 #define MUTATERT 1
 #define CROSSRT 90
 #define MAXGENS 400
@@ -30,7 +31,9 @@ double x2(int i);
 double x2_2(int i);
 double customFunc1(int i);
 int pattern(int i);
+double nDamas(int i);
 
+void elitism(char tipo);
 void mutation(char type);
 void crossover1p(char tipo);
 void crossunif(char tipo);

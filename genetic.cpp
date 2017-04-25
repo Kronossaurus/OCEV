@@ -13,6 +13,12 @@ default_random_engine generator(seed);
 uniform_real_distribution<double> distribution(RANGEINF, RANGESUP);
 uniform_real_distribution<double> percentage(0, 100);
 
+void elitism(char tipo){
+    for(int i=0; i<ELITISM; i++)
+        if(tipo == 'i')
+            popint[i] = outInt;
+}
+
 int bAlternados(int i, char tipo){
     int fitness=0;
     if(tipo == 'b'){
@@ -519,6 +525,8 @@ void AG(char type){
         // printf("\nGen %d: \n", i-1);
         // printGen(type);
 
+
+
         //selection
         // printf("Roleta\n");
         roulette(type);
@@ -530,11 +538,15 @@ void AG(char type){
         // crossunif(type);
         PMX(type);
 
+
         //mutation
         // printf("Mutation\n");
         // mutation(type);
         // deltaMutation(type);
         swapPosition(type);
+        
+        //elitism
+        elitism(type);
 
         //fitness update
         // printf("Fitness\n");
