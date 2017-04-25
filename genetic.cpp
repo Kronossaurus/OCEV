@@ -85,6 +85,8 @@ int pattern(int i){
 }
 
 int nDamas(int i){
+    // #define RANGEINF 0
+    // #define RANGESUP ENCSIZE - 1
     int fitness = 0;
     for(int j = 0; j<ENCSIZE; j++){
         for(int k = j+1; k<ENCSIZE; k++){
@@ -281,9 +283,48 @@ void PMX(char tipo){
         exit(0);
     }
     int cut1, cut2;
-    cut1 = rand()%(ENCSIZE-1);
-    cut2 = cut1 + 1 +rand()%(ENCSIZE-cut1);
-    printf("1 = %d, 2 = %d\n", cut1, cut2);
+    for(int i=0; i<POPSIZE; i+=2){
+        cut1 = rand()%(ENCSIZE-1);
+        cut2 = cut1 + 1 +rand()%(ENCSIZE-cut1-1);
+        for(int j=0; j<ENCSIZE; j++){
+            if(j>cut1 && j<cut2)
+                popint[i][j] = popiInt[i+1][j];
+            else{
+                for(int k=cut1; k<cut2; k++){
+                    // printf("k1: %d, k2: %d\tcut1: %d, cut2: %d\n", k1, k2, cut1, cut2);
+                    // printf("(%d, %d); (%d, %d)\n", popint[i][k1], popint[i+1][k1], popint[i][k2], popint[i+1][k2]);
+                    // for (int x = 0; x < ENCSIZE; ++x)
+                    // {
+                    //     printf(" %d", popint[i][x]);
+                    // }
+                    if(popint[i][j] == popiInt[i+1][k]){
+                        popint[i][j] = popiInt[i+1][k];
+                        j--;
+                    }
+                    else
+                        popint[i][j] = popiInt[i][k];
+                }
+            }
+        }
+        for(int j=0; j<ENCSIZE; j++){
+            if(j>cut1 && j<cut2)
+                popint[i+1][j] = popiInt[i][j];
+            else{
+                for(int k=cut1; k<cut2; k++){
+                    // printf("k1: %d, k2: %d\tcut1: %d, cut2: %d\n", k1, k2, cut1, cut2);
+                    // printf("(%d, %d); (%d, %d)\n", popint[i][k1], popint[i+1][k1], popint[i][k2], popint[i+1][k2]);
+                    // for (int x = 0; x < ENCSIZE; ++x)
+                    // {
+                    //     printf(" %d", popint[i][x]);
+                    // }
+                    if(popint[i+1][j] == popiInt[i][k]){
+                        popint[i+1][j] = popiInt[i][k];
+                        j--;
+                    }
+                }
+            }
+        }
+    }
 }
 
 void roulette(char tipo){
@@ -496,12 +537,14 @@ void AG(char type){
         // printInt(type);
         // printf("Crossover\n");
         // crossover(type);
+        // crossunif(type);
         PMX(type);
 
         //mutation
         // printf("Mutation\n");
-        mutation(type);
+        // mutation(type);
         // deltaMutation(type);
+        swapPosition(type);
 
         //fitness update
         // printf("Fitness\n");

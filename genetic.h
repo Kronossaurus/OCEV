@@ -17,7 +17,7 @@ using std::uniform_real_distribution;
 #define ENCSIZE 8
 #define POPSIZE 50
 #define RANGEINF 0
-#define RANGESUP 7
+#define RANGESUP ENCSIZE - 1
 #define MUTATERT 1 //trocar pra permilagem
 #define CROSSRT 90
 #define MAXGENS 400
