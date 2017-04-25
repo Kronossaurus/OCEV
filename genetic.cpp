@@ -88,7 +88,7 @@ int nDamas(int i){
     int fitness = 0;
     for(int j = 0; j<ENCSIZE; j++){
         for(int k = j+1; k<ENCSIZE; k++){
-            if(k-j == abs(popint[i][j]-popbin[i][k]))
+            if(k-j == abs(popint[i][j]-popint[i][k]))
                 fitness++;
         }
     }
@@ -146,6 +146,26 @@ void deltaMutation(char type){
         for(int j=0; j<ENCSIZE; j++){
             if(rand()%101 < MUTATERT){
                 popdou[i][j] += rand()%2 == 0? deltaDist(generator) : -deltaDist(generator);
+            }
+        }
+    }
+}
+
+void swapPosition(char type){
+    if (type != 'i'){
+        printf("Wrong type for swapPosition\n");
+        exit(0);
+    }
+    for(int i=0; i<POPSIZE; i++){
+        for(int j=0; j<ENCSIZE; j++){
+            if(rand()%101 < MUTATERT){
+                int target = j;
+                while(target == j){
+                    target = rand()%ENCSIZE;
+                }
+                int aux = popint[i][j];
+                popint[i][j] = popint[i][target];
+                popint[i][target] = aux;
             }
         }
     }
@@ -253,6 +273,17 @@ void crossunif(char tipo){
             }
         }
     }
+}
+
+void PMX(char tipo){
+    if (tipo != 'i'){
+        printf("Wrong type for PMX\n");
+        exit(0);
+    }
+    int cut1, cut2;
+    cut1 = rand()%(ENCSIZE-1);
+    cut2 = cut1 + 1 +rand()%(ENCSIZE-cut1);
+    printf("1 = %d, 2 = %d\n", cut1, cut2);
 }
 
 void roulette(char tipo){
@@ -424,7 +455,7 @@ void Fitness(char type){//this function fills the fit vector and the sum variabl
         }
 
         else if(type == 'i'){
-            fit[i] = bAlternados(i, type);
+            fit[i] = nDamas(i);
             if(fit[i] > outFit){
                 outFit = fit[i];
                 outInt = popint[i];
@@ -465,7 +496,7 @@ void AG(char type){
         // printInt(type);
         // printf("Crossover\n");
         // crossover(type);
-        crossunif(type);
+        PMX(type);
 
         //mutation
         // printf("Mutation\n");
