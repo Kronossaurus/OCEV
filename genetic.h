@@ -15,12 +15,14 @@ using std::uniform_real_distribution;
 
 //Extra Parameters
 #define ENCSIZE 8
-#define POPSIZE 50
-#define RANGEINF 0
-#define RANGESUP ENCSIZE - 1
-#define MUTATERT 1 //trocar pra permilagem
+#define POPSIZE 40
+#define RANGEINF 1
+#define RANGESUP ENCSIZE
+#define MUTATERT 1
 #define CROSSRT 90
 #define MAXGENS 400
+
+#define MODCONST 100
 
 // Fitness Functions
 int bAlternados(int i, char tipo);

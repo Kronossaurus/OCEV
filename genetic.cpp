@@ -84,17 +84,19 @@ int pattern(int i){
     return fitness;
 }
 
-int nDamas(int i){
-    // #define RANGEINF 0
-    // #define RANGESUP ENCSIZE - 1
-    int fitness = 0;
+double nDamas(int i){
+    // #define RANGEINF 1
+    // #define RANGESUP ENCSIZE
+    double fitness = ENCSIZE;
     for(int j = 0; j<ENCSIZE; j++){
         for(int k = j+1; k<ENCSIZE; k++){
-            if(k-j == abs(popint[i][j]-popint[i][k]))
-                fitness++;
+            if(k-j == abs(popint[i][j]-popint[i][k])){
+                fitness--;
+                break;
+            }
         }
     }
-    return ENCSIZE - fitness;
+    return fitness/ENCSIZE;
 }
 
 int binToDec(int i){
@@ -109,14 +111,14 @@ void mutation(char type){
     if(type == 'b'){
         for(int i=0; i<POPSIZE; i++){
             for (int j = 0; j<ENCSIZE; j++){
-                if(rand()%101 < MUTATERT)
+                if(rand()%MODCONST < MUTATERT)
                     popbin[i].flip(j);
             }
         }
     }
     else if(type == 'i'){
         for(int i=0; i<POPSIZE; i++){
-            if(rand()%101 < MUTATERT){
+            if(rand()%MODCONST < MUTATERT){
                 int a = rand()%ENCSIZE, b;
                 b = a;
                 while(b==a)
@@ -131,7 +133,7 @@ void mutation(char type){
         for(int i=0; i<POPSIZE; i++){
             for (int j = 0; j<ENCSIZE; j++)
             {
-                if(rand()%101 < MUTATERT)
+                if(rand()%MODCONST < MUTATERT)
                     popdou[i][j] = distribution(generator);
             }
         }
@@ -146,7 +148,7 @@ void deltaMutation(char type){
     uniform_real_distribution<double> deltaDist(0, 0.2);
     for(int i=0; i<POPSIZE; i++){
         for(int j=0; j<ENCSIZE; j++){
-            if(rand()%101 < MUTATERT){
+            if(rand()%MODCONST < MUTATERT){
                 popdou[i][j] += rand()%2 == 0? deltaDist(generator) : -deltaDist(generator);
             }
         }
@@ -160,7 +162,7 @@ void swapPosition(char type){
     }
     for(int i=0; i<POPSIZE; i++){
         for(int j=0; j<ENCSIZE; j++){
-            if(rand()%101 < MUTATERT){
+            if(rand()%MODCONST < MUTATERT){
                 int target = j;
                 while(target == j){
                     target = rand()%ENCSIZE;
@@ -286,40 +288,28 @@ void PMX(char tipo){
     for(int i=0; i<POPSIZE; i+=2){
         cut1 = rand()%(ENCSIZE-1);
         cut2 = cut1 + 1 +rand()%(ENCSIZE-cut1-1);
+        for(int j=cut1; j<=cut2; j++){
+            popint[i][j] = popiInt[i+1][j];
+            popint[i+1][j] = popiInt[i][j];
+        }
         for(int j=0; j<ENCSIZE; j++){
-            if(j>cut1 && j<cut2)
-                popint[i][j] = popiInt[i+1][j];
-            else{
-                for(int k=cut1; k<cut2; k++){
-                    // printf("k1: %d, k2: %d\tcut1: %d, cut2: %d\n", k1, k2, cut1, cut2);
-                    // printf("(%d, %d); (%d, %d)\n", popint[i][k1], popint[i+1][k1], popint[i][k2], popint[i+1][k2]);
-                    // for (int x = 0; x < ENCSIZE; ++x)
-                    // {
-                    //     printf(" %d", popint[i][x]);
-                    // }
-                    if(popint[i][j] == popiInt[i+1][k]){
-                        popint[i][j] = popiInt[i+1][k];
-                        j--;
+            if(j<cut1 || j>cut2){
+                popint[i][j] = popiInt[i][j];
+                for(int k=cut1; k<=cut2; k++){
+                    if(popint[i][j] == popint[i][k]){
+                        popint[i][j] = popint[i+1][k];
+                        k=cut1-1;
                     }
-                    else
-                        popint[i][j] = popiInt[i][k];
                 }
             }
         }
         for(int j=0; j<ENCSIZE; j++){
-            if(j>cut1 && j<cut2)
-                popint[i+1][j] = popiInt[i][j];
-            else{
-                for(int k=cut1; k<cut2; k++){
-                    // printf("k1: %d, k2: %d\tcut1: %d, cut2: %d\n", k1, k2, cut1, cut2);
-                    // printf("(%d, %d); (%d, %d)\n", popint[i][k1], popint[i+1][k1], popint[i][k2], popint[i+1][k2]);
-                    // for (int x = 0; x < ENCSIZE; ++x)
-                    // {
-                    //     printf(" %d", popint[i][x]);
-                    // }
-                    if(popint[i+1][j] == popiInt[i][k]){
-                        popint[i+1][j] = popiInt[i][k];
-                        j--;
+            if(j<cut1 || j>cut2){
+                popint[i+1][j] = popiInt[i+1][j];
+                for(int k=cut1; k<=cut2; k++){
+                    if(popint[i+1][j] == popint[i+1][k]){
+                        popint[i+1][j] = popint[i][k];
+                        k=cut1-1;
                     }
                 }
             }
