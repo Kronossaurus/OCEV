@@ -3,12 +3,8 @@
 
 set terminal pngcairo
 
-#label x
-set xlabel "Iterações"
-set autoscale
 
-#label y
-set ylabel "Fitness"
+set autoscale
 
 #title of file
 set title ""
@@ -20,7 +16,6 @@ set style data points
 set key font ",15"
 
 set key spacing 5
-set key top center
 #unset key
 
 set style line 1 lc rgb  '#8b1a0e' pt 8  ps 1 lt 1 lw 2
@@ -39,19 +34,30 @@ set style line 13 lc rgb '#946b93' pt 13 ps 1 lt 1 lw 2
 set style line 14 lc rgb '#8ffab3' pt 14 ps 1 lt 1 lw 2
 set style line 15 lc rgb '#fdb4bd' pt 15 ps 1 lt 1 lw 2
 set style line 16 lc rgb '#ed9821' pt 15 ps 1 lt 1 lw 2
+set style line 17 lc rgb '#60ab22' pt 16 ps 1 lt 1 lw 2
 
-set style line 12 lc rgb '#808080' lt 0 lw 1
+set style line 12 lc rgb '#707070' lt 0 lw 1
 set grid back ls 12
 
-set style line 11 lc rgb '#808080' lt 1
+set style line 11 lc rgb '#707070' lt 1
 set border 3 back ls 11
 set tics nomirror
 
 set style func linespoints
 #set logscale y
 
+#label x
+set xlabel "Gerações"
+#label y
+set key bottom center
+set ylabel "Fitness"
 set output 'output.png'
+
 plot 'data.txt' using 1:2 title 'Média' with linespoints ls 1 pointsize 0, 'data.txt' using 1:3 title 'Maior' with linespoints ls 4 pointsize 0
 
+
+
+set key top center
+set ylabel "Diversidade"
 set output 'outDiversity.png'
-plot 'data.txt' using 1:4 title 'Diversidade' with linespoints ls 3 pointsize 0
+plot 'data.txt' using 1:4 title 'Diversidade' with linespoints ls 17 pointsize 0
