@@ -4,5 +4,8 @@ all:
 plot:
 	gnuplot plot.sh
 
+calc:
+	gcc -Wall mutatCalc.c -o calc -lm
+
 clean:
-	rm main *.png data.txt
+	rm main *.png data.txt calc
