@@ -84,6 +84,19 @@ int pattern(int i){
     return fitness;
 }
 
+int nDamas(int i){
+    // #define RANGEINF 0
+    // #define RANGESUP ENCSIZE - 1
+    int fitness = 0;
+    for(int j = 0; j<ENCSIZE; j++){
+        for(int k = j+1; k<ENCSIZE; k++){
+            if(k-j == abs(popint[i][j]-popint[i][k]))
+                fitness++;
+        }
+    }
+    return ENCSIZE - fitness;
+}
+
 int binToDec(int i){
 	int sum=0;
 	for(int j=0; j<ENCSIZE; j++){
@@ -135,6 +148,26 @@ void deltaMutation(char type){
         for(int j=0; j<ENCSIZE; j++){
             if(rand()%101 < MUTATERT){
                 popdou[i][j] += rand()%2 == 0? deltaDist(generator) : -deltaDist(generator);
+            }
+        }
+    }
+}
+
+void swapPosition(char type){
+    if (type != 'i'){
+        printf("Wrong type for swapPosition\n");
+        exit(0);
+    }
+    for(int i=0; i<POPSIZE; i++){
+        for(int j=0; j<ENCSIZE; j++){
+            if(rand()%101 < MUTATERT){
+                int target = j;
+                while(target == j){
+                    target = rand()%ENCSIZE;
+                }
+                int aux = popint[i][j];
+                popint[i][j] = popint[i][target];
+                popint[i][target] = aux;
             }
         }
     }
@@ -239,6 +272,56 @@ void crossunif(char tipo){
             else{
                 popdou[i] = popdInt[i];
                 popdou[i+1] = popdInt[i+1];
+            }
+        }
+    }
+}
+
+void PMX(char tipo){
+    if (tipo != 'i'){
+        printf("Wrong type for PMX\n");
+        exit(0);
+    }
+    int cut1, cut2;
+    for(int i=0; i<POPSIZE; i+=2){
+        cut1 = rand()%(ENCSIZE-1);
+        cut2 = cut1 + 1 +rand()%(ENCSIZE-cut1-1);
+        for(int j=0; j<ENCSIZE; j++){
+            if(j>cut1 && j<cut2)
+                popint[i][j] = popiInt[i+1][j];
+            else{
+                for(int k=cut1; k<cut2; k++){
+                    // printf("k1: %d, k2: %d\tcut1: %d, cut2: %d\n", k1, k2, cut1, cut2);
+                    // printf("(%d, %d); (%d, %d)\n", popint[i][k1], popint[i+1][k1], popint[i][k2], popint[i+1][k2]);
+                    // for (int x = 0; x < ENCSIZE; ++x)
+                    // {
+                    //     printf(" %d", popint[i][x]);
+                    // }
+                    if(popint[i][j] == popiInt[i+1][k]){
+                        popint[i][j] = popiInt[i+1][k];
+                        j--;
+                    }
+                    else
+                        popint[i][j] = popiInt[i][k];
+                }
+            }
+        }
+        for(int j=0; j<ENCSIZE; j++){
+            if(j>cut1 && j<cut2)
+                popint[i+1][j] = popiInt[i][j];
+            else{
+                for(int k=cut1; k<cut2; k++){
+                    // printf("k1: %d, k2: %d\tcut1: %d, cut2: %d\n", k1, k2, cut1, cut2);
+                    // printf("(%d, %d); (%d, %d)\n", popint[i][k1], popint[i+1][k1], popint[i][k2], popint[i+1][k2]);
+                    // for (int x = 0; x < ENCSIZE; ++x)
+                    // {
+                    //     printf(" %d", popint[i][x]);
+                    // }
+                    if(popint[i+1][j] == popiInt[i][k]){
+                        popint[i+1][j] = popiInt[i][k];
+                        j--;
+                    }
+                }
             }
         }
     }
@@ -413,7 +496,7 @@ void Fitness(char type){//this function fills the fit vector and the sum variabl
         }
 
         else if(type == 'i'){
-            fit[i] = bAlternados(i, type);
+            fit[i] = nDamas(i);
             if(fit[i] > outFit){
                 outFit = fit[i];
                 outInt = popint[i];
@@ -454,12 +537,14 @@ void AG(char type){
         // printInt(type);
         // printf("Crossover\n");
         // crossover(type);
-        crossunif(type);
+        // crossunif(type);
+        PMX(type);
 
         //mutation
         // printf("Mutation\n");
-        mutation(type);
+        // mutation(type);
         // deltaMutation(type);
+        swapPosition(type);
 
         //fitness update
         // printf("Fitness\n");
