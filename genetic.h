@@ -14,14 +14,14 @@ using std::default_random_engine;
 using std::uniform_real_distribution;
 
 //Extra Parameters
-#define ENCSIZE 16
-#define POPSIZE 40
+#define ENCSIZE 64
+#define POPSIZE 50
 #define RANGEINF 1
 #define RANGESUP ENCSIZE
 #define ELITISM 1
 #define MUTATERT 1
 #define CROSSRT 90
-#define MAXGENS 400
+#define MAXGENS 800
 
 #define MODCONST 100
 
@@ -42,6 +42,7 @@ void printInt(char tipo);
 void init(char tipo);
 int binToDec(int i);
 void roulette(char tipo);
+void FitScaling(int i);
 
 double diversity(char type);
 void logMedias(int iteration, double div);

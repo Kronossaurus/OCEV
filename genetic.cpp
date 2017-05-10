@@ -5,7 +5,7 @@ vector<int>     *popint, *popiInt = NULL, outInt;
 vector<double>  *popdou, *popdInt = NULL, outDou;
 
 //global to reduce processing complexity
-double fit[POPSIZE], sum = 0, maior = 0, outFit = 0;
+double fit[POPSIZE], sum = 0, maior = 0, menor = RAND_MAX, outFit = 0;
 FILE *file = NULL;
 
 unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -481,6 +481,8 @@ double diversity(char type){
 void Fitness(char type){//this function fills the fit vector and the sum variable
     maior = 0;
     sum = 0;
+    menor = RAND_MAX;
+
     for(int i=0; i<POPSIZE; i++){
 
         if(type == 'b'){
@@ -508,8 +510,28 @@ void Fitness(char type){//this function fills the fit vector and the sum variabl
         }
         if(fit[i] > maior)
             maior = fit[i];
+        if(fit[i] < menor)
+            menor = fit[i];
         sum += fit[i];
     }
+}
+
+void FitScaling(int i){
+    double C = (2 - 1.2) * i / MAXGENS;
+    // double C = 1.2 * pow(2 / 1.2, (MAXGENS - i) / MAXGENS);
+    // double C = 1.2 - pow(MAXGENS - i, log(1.2 - 2) / log(MAXGENS));
+    double media = sum / POPSIZE;
+    double alpha = 0, beta = 0;
+    if(menor > (C * media - maior) / (C - 1)){
+        alpha = (media * (C - 1)) / (maior - menor);
+        beta = (media * (maior - C * media)) / (maior - media);
+    }
+    else{
+        alpha = media / (media - menor);
+        beta = (-menor * media) / (media - menor);
+    }
+    for (int j = 0; j < POPSIZE; ++j)
+        fit[j] = alpha * fit[j] + beta;
 }
 
 void AG(char type){
@@ -551,6 +573,7 @@ void AG(char type){
         //fitness update
         // printf("Fitness\n");
         Fitness(type);
+        FitScaling(i);
 
         //log
         // printf("Log\n");
