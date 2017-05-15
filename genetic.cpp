@@ -17,6 +17,10 @@ void elitism(char tipo){
     for(int i=0; i<ELITISM; i++)
         if(tipo == 'i')
             popint[i] = outInt;
+        else if(tipo == 'b')
+            popbin[i] = outBin;
+        else
+            popdou[i] = outDou;
 }
 
 int bAlternados(int i, char tipo){
@@ -545,7 +549,7 @@ void AG(char type){
     logMedias(0, div);
     for(int i=1; i<=MAXGENS; i++){
         // printf("\nGen %d: \n", i-1);
-        // printGen(type);
+        // printGen(type); //Escalonado
 
 
 
@@ -573,6 +577,7 @@ void AG(char type){
         //fitness update
         // printf("Fitness\n");
         Fitness(type);
+        // printGen(type); //Nao Escalonado
         FitScaling(i);
 
         //log
