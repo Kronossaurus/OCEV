@@ -14,14 +14,14 @@ using std::default_random_engine;
 using std::uniform_real_distribution;
 
 //Extra Parameters
-#define ENCSIZE 6
-#define POPSIZE 10
+#define ENCSIZE 64
+#define POPSIZE 50
 #define RANGEINF 1
 #define RANGESUP ENCSIZE
-#define ELITISM 0
-#define MUTATERT 0
-#define CROSSRT 0
-#define MAXGENS 4
+#define ELITISM 1
+#define MUTATERT 1
+#define CROSSRT 90
+#define MAXGENS 800
 
 #define MODCONST 100
 
