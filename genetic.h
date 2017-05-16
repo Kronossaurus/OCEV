@@ -12,15 +12,17 @@ using std::bitset;
 using std::vector;
 using std::default_random_engine;
 using std::uniform_real_distribution;
+using std::random_shuffle;
 
 //Extra Parameters
-#define ENCSIZE 64
+#define ENCSIZE 128
 #define POPSIZE 50
 #define RANGEINF 1
 #define RANGESUP ENCSIZE
 #define ELITISM 1
+#define GENGAP0 2
 #define MUTATERT 1
-#define CROSSRT 90
+#define CROSSRT 98
 #define MAXGENS 800
 
 #define MODCONST 100
@@ -46,6 +48,7 @@ void FitScaling(int i);
 
 double diversity(char type);
 void logMedias(int iteration, double div);
+void genShuffle(char type);
 
 void AG(char type);
 void Fitness(char type);

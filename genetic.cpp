@@ -1,8 +1,12 @@
 #include "genetic.h"
 
-bitset<ENCSIZE> *popbin, *popbInt = NULL, outBin;//current and intermediate populations, output individual
-vector<int>     *popint, *popiInt = NULL, outInt;
-vector<double>  *popdou, *popdInt = NULL, outDou;
+vector<bitset<ENCSIZE> >popbin, popbInt; //current and intermediate populations
+vector<vector<int> >    popint, popiInt;
+vector<vector<double> > popdou, popdInt;
+
+bitset<ENCSIZE> outBin;//output
+vector<int>     outInt;
+vector<double>  outDou;
 
 //global to reduce processing complexity
 double fit[POPSIZE], sum = 0, maior = 0, menor = RAND_MAX, outFit = 0;
@@ -119,7 +123,7 @@ int binToDec(int i){
 
 void mutation(char type){
     if(type == 'b'){
-        for(int i=0; i<POPSIZE; i++){
+        for(int i=GENGAP0; i<POPSIZE; i++){
             for (int j = 0; j<ENCSIZE; j++){
                 if(rand()%MODCONST < MUTATERT)
                     popbin[i].flip(j);
@@ -127,7 +131,7 @@ void mutation(char type){
         }
     }
     else if(type == 'i'){
-        for(int i=0; i<POPSIZE; i++){
+        for(int i=GENGAP0; i<POPSIZE; i++){
             if(rand()%MODCONST < MUTATERT){
                 int a = rand()%ENCSIZE, b;
                 b = a;
@@ -140,7 +144,7 @@ void mutation(char type){
         }
     }
     else{
-        for(int i=0; i<POPSIZE; i++){
+        for(int i=GENGAP0; i<POPSIZE; i++){
             for (int j = 0; j<ENCSIZE; j++)
             {
                 if(rand()%MODCONST < MUTATERT)
@@ -156,7 +160,7 @@ void deltaMutation(char type){
         exit(0);
     }
     uniform_real_distribution<double> deltaDist(0, 0.2);
-    for(int i=0; i<POPSIZE; i++){
+    for(int i=GENGAP0; i<POPSIZE; i++){
         for(int j=0; j<ENCSIZE; j++){
             if(rand()%MODCONST < MUTATERT){
                 popdou[i][j] += rand()%2 == 0? deltaDist(generator) : -deltaDist(generator);
@@ -170,7 +174,7 @@ void swapPosition(char type){
         printf("Wrong type for swapPosition\n");
         exit(0);
     }
-    for(int i=0; i<POPSIZE; i++){
+    for(int i=GENGAP0; i<POPSIZE; i++){
         for(int j=0; j<ENCSIZE; j++){
             if(rand()%MODCONST < MUTATERT){
                 int target = j;
@@ -186,7 +190,7 @@ void swapPosition(char type){
 }
 
 void crossover1p(char tipo){
-    for(int i=0; i<POPSIZE; i+=2){
+    for(int i=GENGAP0; i<POPSIZE; i+=2){
         if(rand()%101 < CROSSRT){
             int corte = rand()%(ENCSIZE-1) + 1;
             for(int j=0; j<ENCSIZE; j++){
@@ -239,7 +243,7 @@ void crossover1p(char tipo){
 }
 
 void crossunif(char tipo){
-    for(int i=0; i<POPSIZE; i+=2){
+    for(int i=GENGAP0; i<POPSIZE; i+=2){
         if(rand()%101 < CROSSRT){
             for(int j=0; j<ENCSIZE; j++){
                 if(rand()%2 == 0){
@@ -295,7 +299,7 @@ void PMX(char tipo){
         exit(0);
     }
     int cut1, cut2;
-    for(int i=0; i<POPSIZE; i+=2){
+    for(int i=GENGAP0; i<POPSIZE; i+=2){
         cut1 = rand()%(ENCSIZE-1);
         cut2 = cut1 + 1 +rand()%(ENCSIZE-cut1-1);
         for(int j=cut1; j<=cut2; j++){
@@ -417,8 +421,6 @@ void printInt(char tipo){
 
 void init(char tipo){
     if(tipo =='b'){
-        popbin = (bitset<ENCSIZE>*)malloc(sizeof(bitset<ENCSIZE>)*POPSIZE);
-        popbInt = (bitset<ENCSIZE>*)malloc(sizeof(bitset<ENCSIZE>)*POPSIZE);
         for(int i=0; i<POPSIZE; i++){
             for(int j=0; j<ENCSIZE; j++){
                 if(rand()%2==0)
@@ -431,8 +433,8 @@ void init(char tipo){
             popbin[0][i] = 1;
     }
     else if(tipo == 'i'){
-        popint = (vector<int>*)malloc(sizeof(vector<int>)*POPSIZE);
-        popiInt = (vector<int>*)malloc(sizeof(vector<int>)*POPSIZE);
+        popint.reserve(POPSIZE);
+        popiInt.reserve(POPSIZE);
         int temp;
         if(RANGESUP - RANGEINF + 1 < ENCSIZE){
             printf("Insufficient range\n");
@@ -450,8 +452,7 @@ void init(char tipo){
         }
     }
     else{
-        popdou = (vector<double>*)malloc(sizeof(vector<double>)*POPSIZE);
-        popdInt = (vector<double>*)malloc(sizeof(vector<double>)*POPSIZE);
+        popdou.reserve(POPSIZE); 
         for(int i=0; i<POPSIZE; i++){
             for(int j=0; j<ENCSIZE; j++){
                 popdou[i].push_back(distribution(generator));
@@ -469,17 +470,19 @@ void logMedias(int iteration, double div){
 
 double diversity(char type){
     double div = 0;
-    if(type == 'b'){
-        for (int i = 0; i < POPSIZE; i++){
-            for (int j = i+1; j < POPSIZE; j++){
-                for (int k = 0; k < ENCSIZE; k++){
-                    if(popbin[i][k] != popbin[j][k])
-                        div++;
-                }
+    for (int i = 0; i < POPSIZE; i++){
+        for (int j = i+1; j < POPSIZE; j++){
+            for (int k = 0; k < ENCSIZE; k++){
+                if(type == 'b')
+                    div += sqrt((popbin[i][k] - popbin[j][k]) * (popbin[i][k] - popbin[j][k]));
+                else if(type == 'i')
+                    div += sqrt((popint[i][k] - popint[j][k]) * (popint[i][k] - popint[j][k]));
+                else
+                    div += sqrt((popdou[i][k] - popdou[j][k]) * (popdou[i][k] - popdou[j][k]));
             }
         }
     }
-    return div/POPSIZE/POPSIZE;
+    return div/((POPSIZE+1)*POPSIZE/2);
 }
 
 void Fitness(char type){//this function fills the fit vector and the sum variable
@@ -521,7 +524,9 @@ void Fitness(char type){//this function fills the fit vector and the sum variabl
 }
 
 void FitScaling(int i){
-    double C = (2 - 1.2) * i / MAXGENS;
+    // double C = 2;
+    // double C = (2 - 1.2) * i / MAXGENS;
+    double C = (2 - 1.2) * (POPSIZE - i) / MAXGENS;
     // double C = 1.2 * pow(2 / 1.2, (MAXGENS - i) / MAXGENS);
     // double C = 1.2 - pow(MAXGENS - i, log(1.2 - 2) / log(MAXGENS));
     double media = sum / POPSIZE;
@@ -538,6 +543,20 @@ void FitScaling(int i){
         fit[j] = alpha * fit[j] + beta;
 }
 
+void genShuffle(char type){
+    if(GENGAP0 > 0){
+        if(type == 'b'){
+            random_shuffle(popbin.begin(), popbin.end());
+        }
+        else if(type == 'i'){
+            random_shuffle(popint.begin(), popint.end());
+        }
+        else{
+            random_shuffle(popdou.begin(), popdou.end());
+        }
+    }
+}
+
 void AG(char type){
     init(type);
     //fitness update
@@ -548,12 +567,11 @@ void AG(char type){
     div = diversity(type);
     logMedias(0, div);
     for(int i=1; i<=MAXGENS; i++){
+
         // printf("\nGen %d: \n", i-1);
         // printGen(type); //Escalonado
 
-
-
-        //selection
+        // selection
         // printf("Roleta\n");
         roulette(type);
 
@@ -573,6 +591,8 @@ void AG(char type){
         
         //elitism
         elitism(type);
+        // printf("Shuffle\n");
+        genShuffle(type);
 
         //fitness update
         // printf("Fitness\n");
