@@ -470,6 +470,7 @@ void logMedias(int iteration, double div){
 
 double diversity(char type){
     double div = 0;
+    // int cont = 0;
     for (int i = 0; i < POPSIZE; i++){
         for (int j = i+1; j < POPSIZE; j++){
             for (int k = 0; k < ENCSIZE; k++){
@@ -480,9 +481,11 @@ double diversity(char type){
                 else
                     div += sqrt((popdou[i][k] - popdou[j][k]) * (popdou[i][k] - popdou[j][k]));
             }
+            // cont++;
         }
     }
-    return div/((POPSIZE+1)*POPSIZE/2);
+    // printf("cont = %d real = %d", cont,(POPSIZE-1)*POPSIZE/2);
+    return div/((POPSIZE-1)*POPSIZE/2);
 }
 
 void Fitness(char type){//this function fills the fit vector and the sum variable
