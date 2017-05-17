@@ -10,6 +10,7 @@ vector<double>  outDou;
 
 //global to reduce processing complexity
 double fit[POPSIZE], sum = 0, maior = 0, menor = RAND_MAX, outFit = 0;
+int gap = GENGAP0;
 FILE *file = NULL;
 
 unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -123,7 +124,7 @@ int binToDec(int i){
 
 void mutation(char type){
     if(type == 'b'){
-        for(int i=GENGAP0; i<POPSIZE; i++){
+        for(int i=gap; i<POPSIZE; i++){
             for (int j = 0; j<ENCSIZE; j++){
                 if(rand()%MODCONST < MUTATERT)
                     popbin[i].flip(j);
@@ -131,7 +132,7 @@ void mutation(char type){
         }
     }
     else if(type == 'i'){
-        for(int i=GENGAP0; i<POPSIZE; i++){
+        for(int i=gap; i<POPSIZE; i++){
             if(rand()%MODCONST < MUTATERT){
                 int a = rand()%ENCSIZE, b;
                 b = a;
@@ -144,7 +145,7 @@ void mutation(char type){
         }
     }
     else{
-        for(int i=GENGAP0; i<POPSIZE; i++){
+        for(int i=gap; i<POPSIZE; i++){
             for (int j = 0; j<ENCSIZE; j++)
             {
                 if(rand()%MODCONST < MUTATERT)
@@ -160,7 +161,7 @@ void deltaMutation(char type){
         exit(0);
     }
     uniform_real_distribution<double> deltaDist(0, 0.2);
-    for(int i=GENGAP0; i<POPSIZE; i++){
+    for(int i=gap; i<POPSIZE; i++){
         for(int j=0; j<ENCSIZE; j++){
             if(rand()%MODCONST < MUTATERT){
                 popdou[i][j] += rand()%2 == 0? deltaDist(generator) : -deltaDist(generator);
@@ -174,7 +175,7 @@ void swapPosition(char type){
         printf("Wrong type for swapPosition\n");
         exit(0);
     }
-    for(int i=GENGAP0; i<POPSIZE; i++){
+    for(int i=gap; i<POPSIZE; i++){
         for(int j=0; j<ENCSIZE; j++){
             if(rand()%MODCONST < MUTATERT){
                 int target = j;
@@ -190,7 +191,7 @@ void swapPosition(char type){
 }
 
 void crossover1p(char tipo){
-    for(int i=GENGAP0; i<POPSIZE; i+=2){
+    for(int i=gap; i<POPSIZE; i+=2){
         if(rand()%101 < CROSSRT){
             int corte = rand()%(ENCSIZE-1) + 1;
             for(int j=0; j<ENCSIZE; j++){
@@ -243,7 +244,7 @@ void crossover1p(char tipo){
 }
 
 void crossunif(char tipo){
-    for(int i=GENGAP0; i<POPSIZE; i+=2){
+    for(int i=gap; i<POPSIZE; i+=2){
         if(rand()%101 < CROSSRT){
             for(int j=0; j<ENCSIZE; j++){
                 if(rand()%2 == 0){
@@ -299,7 +300,7 @@ void PMX(char tipo){
         exit(0);
     }
     int cut1, cut2;
-    for(int i=GENGAP0; i<POPSIZE; i+=2){
+    for(int i=gap; i<POPSIZE; i+=2){
         cut1 = rand()%(ENCSIZE-1);
         cut2 = cut1 + 1 +rand()%(ENCSIZE-cut1-1);
         for(int j=cut1; j<=cut2; j++){
@@ -528,10 +529,11 @@ void Fitness(char type){//this function fills the fit vector and the sum variabl
 
 void FitScaling(int i){
     // double C = 2;
-    // double C = (2 - 1.2) * i / MAXGENS;
-    double C = (2 - 1.2) * (POPSIZE - i) / MAXGENS;
-    // double C = 1.2 * pow(2 / 1.2, (MAXGENS - i) / MAXGENS);
-    // double C = 1.2 - pow(MAXGENS - i, log(1.2 - 2) / log(MAXGENS));
+    double C = (2 - 1.2) * i / MAXGENS + 1.2; //linear crescente
+    // double C = (2 - 1.2) * (MAXGENS - i) / MAXGENS + 1.2; //linear decrescente
+    // double C = 2 * pow(1.2 / 2, i / MAXGENS); //cooling schedule 1
+    // double C = 2 - pow(i, log(2 - 1.2) / log(MAXGENS)); //cooling schedule 3
+    printf("%lf\n", C);
     double media = sum / POPSIZE;
     double alpha = 0, beta = 0;
     if(menor > (C * media - maior) / (C - 1)){
@@ -547,7 +549,7 @@ void FitScaling(int i){
 }
 
 void genShuffle(char type){
-    if(GENGAP0 > 0){
+    if(gap > 0){
         if(type == 'b'){
             random_shuffle(popbin.begin(), popbin.end());
         }
@@ -558,6 +560,16 @@ void genShuffle(char type){
             random_shuffle(popdou.begin(), popdou.end());
         }
     }
+}
+
+void gapUpdate(char type, int i){
+    if(gap == 0)
+        return;
+    static int space = (MAXGENS-100)/GENGAP0*2;
+    if(i%space == 0 && i <= MAXGENS-100)
+        gap -= 2;
+    // printf("it: %d, gap: %d, space: %d\n", i, gap, space);
+    genShuffle(type);
 }
 
 void AG(char type){
@@ -594,8 +606,7 @@ void AG(char type){
         
         //elitism
         elitism(type);
-        // printf("Shuffle\n");
-        genShuffle(type);
+        // gapUpdate(type, i);
 
         //fitness update
         // printf("Fitness\n");

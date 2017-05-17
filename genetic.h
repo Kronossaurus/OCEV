@@ -20,10 +20,10 @@ using std::random_shuffle;
 #define RANGEINF 1
 #define RANGESUP ENCSIZE
 #define ELITISM 1
-#define GENGAP0 2
+#define GENGAP0 20
 #define MUTATERT 1
 #define CROSSRT 98
-#define MAXGENS 800
+#define MAXGENS 1000
 
 #define MODCONST 100
 
