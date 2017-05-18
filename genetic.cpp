@@ -528,12 +528,12 @@ void Fitness(char type){//this function fills the fit vector and the sum variabl
 }
 
 void FitScaling(int i){
-    // double C = 2;
-    double C = (2 - 1.2) * i / MAXGENS + 1.2; //linear crescente
+    double C = 0;
+    // double C = (2 - 1.2) * i / MAXGENS + 1.2; //linear crescente
     // double C = (2 - 1.2) * (MAXGENS - i) / MAXGENS + 1.2; //linear decrescente
-    // double C = 2 * pow(1.2 / 2, i / MAXGENS); //cooling schedule 1
-    // double C = 2 - pow(i, log(2 - 1.2) / log(MAXGENS)); //cooling schedule 3
-    printf("%lf\n", C);
+    // double C = 2.0 * pow(1.2 / 2.0, 1 - (double) i / MAXGENS); //cooling schedule 1
+    // double C = 3.0 - pow(MAXGENS - i + 1, log(3.0 - 1.2) / (double) log(MAXGENS)); //cooling schedule 3
+    // printf("%lf\n", C);
     double media = sum / POPSIZE;
     double alpha = 0, beta = 0;
     if(menor > (C * media - maior) / (C - 1)){
@@ -544,32 +544,30 @@ void FitScaling(int i){
         alpha = media / (media - menor);
         beta = (-menor * media) / (media - menor);
     }
+    // printf("alpha: %lf, beta: %lf\n", alpha, beta);
     for (int j = 0; j < POPSIZE; ++j)
         fit[j] = alpha * fit[j] + beta;
 }
 
 void genShuffle(char type){
-    if(gap > 0){
-        if(type == 'b'){
-            random_shuffle(popbin.begin(), popbin.end());
-        }
-        else if(type == 'i'){
-            random_shuffle(popint.begin(), popint.end());
-        }
-        else{
-            random_shuffle(popdou.begin(), popdou.end());
-        }
+    if(type == 'b'){
+        random_shuffle(popbin.begin(), popbin.end());
+    }
+    else if(type == 'i'){
+        random_shuffle(popint.begin(), popint.end());
+    }
+    else{
+        random_shuffle(popdou.begin(), popdou.end());
     }
 }
 
 void gapUpdate(char type, int i){
     if(gap == 0)
         return;
-    static int space = (MAXGENS-100)/GENGAP0*2;
-    if(i%space == 0 && i <= MAXGENS-100)
+    static int space = (MAXGENS-200)/(GENGAP0+1)*2;
+    if(i%space == 0 && i <= MAXGENS-200)
         gap -= 2;
-    // printf("it: %d, gap: %d, space: %d\n", i, gap, space);
-    genShuffle(type);
+    printf("it: %d, gap: %d, space: %d\n", i, gap, space);
 }
 
 void AG(char type){
@@ -582,7 +580,8 @@ void AG(char type){
     div = diversity(type);
     logMedias(0, div);
     for(int i=1; i<=MAXGENS; i++){
-
+        if(i%(MAXGENS/10) == 0)
+            printf("%d0%%\n", i/(MAXGENS/10));
         // printf("\nGen %d: \n", i-1);
         // printGen(type); //Escalonado
 
@@ -606,7 +605,7 @@ void AG(char type){
         
         //elitism
         elitism(type);
-        // gapUpdate(type, i);
+        gapUpdate(type, i);
 
         //fitness update
         // printf("Fitness\n");
@@ -618,6 +617,9 @@ void AG(char type){
         // printf("Log\n");
         div = diversity(type);
         logMedias(i, div);
+        
+        //shuffle
+        genShuffle(type);
     }
     printf("Maior Fitness = %.4lf\n", outFit);
     printf("Genótipo do melhor indivíduo =");

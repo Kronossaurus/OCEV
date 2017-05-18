@@ -15,17 +15,17 @@ using std::uniform_real_distribution;
 using std::random_shuffle;
 
 //Extra Parameters
-#define ENCSIZE 128
+#define ENCSIZE 256
 #define POPSIZE 50
 #define RANGEINF 1
 #define RANGESUP ENCSIZE
 #define ELITISM 1
-#define GENGAP0 20
-#define MUTATERT 1
-#define CROSSRT 98
-#define MAXGENS 1000
+#define GENGAP0 0
+#define MUTATERT 2
+#define CROSSRT 100
+#define MAXGENS 2000
 
-#define MODCONST 100
+#define MODCONST 1000
 
 // Fitness Functions
 int bAlternados(int i, char tipo);
