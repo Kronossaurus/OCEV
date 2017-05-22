@@ -15,15 +15,15 @@ using std::uniform_real_distribution;
 using std::random_shuffle;
 
 //Extra Parameters
-#define ENCSIZE 150
+#define ENCSIZE 16
 #define POPSIZE 50
 #define RANGEINF 1
 #define RANGESUP ENCSIZE
 #define ELITISM 1
-#define GENGAP0 10
+#define GENGAP0 12
 #define MUTATERT 1
-#define CROSSRT 90
-#define MAXGENS 1000
+#define CROSSRT 99
+#define MAXGENS 3000
 
 #define MODCONST 100
 

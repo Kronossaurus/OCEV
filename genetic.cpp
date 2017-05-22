@@ -49,13 +49,23 @@ int bAlternados(int i, char tipo){
 }
 
 int deceptive(int i){
+    int blocksize = 4, cont;
     double fitness = 0;
-    for(int j=0; j<ENCSIZE; j++){
-        if(popbin[i][j] == 1)
-            fitness++;
+    if(ENCSIZE%blocksize != 0){
+        printf("Wrong ENCSIZE for deceptive\n");
+        exit(0);
     }
-    if(fitness == 0)
-        fitness = ENCSIZE + 1;
+    for(int k=0; k<ENCSIZE/blocksize; k++){
+        cont = 0;
+        for(int j=k*blocksize; ; j++){
+            // printf("%d\n", j);
+            if(popbin[i][j] == 1)
+                cont++;
+            if(j%blocksize==blocksize-1)
+                break;
+        }
+        fitness += cont == 0? cont + 1 : cont;
+    }
     return fitness;
 }
 
@@ -549,8 +559,8 @@ void Fitness(char type){//this function fills the fit vector and the sum variabl
 
         if(type == 'b'){
             // fit[i] = pattern(i);
-            // fit[i] = deceptive(i);
-            fit[i] = f3(i);
+            fit[i] = deceptive(i);
+            // fit[i] = f3(i);
             if(fit[i] > outFit){
                 outFit = fit[i];
                 outBin = popbin[i];
@@ -617,8 +627,8 @@ void genShuffle(char type){
 void gapUpdate(char type, int i){
     if(gap == 0)
         return;
-    static int space = (MAXGENS-200)/(GENGAP0+1)*2;
-    if(i%space == 0 && i <= MAXGENS-200)
+    static int space = (MAXGENS)/(GENGAP0+1)*2;
+    if(i%space == 0 && i <= MAXGENS)
         gap -= 2;
     // printf("it: %d, gap: %d, space: %d\n", i, gap, space);
 }
@@ -645,8 +655,8 @@ void AG(char type){
         //crossover
         // printInt(type);
         // printf("Crossover\n");
-        crossover1p(type);
-        // crossunif(type);
+        // crossover1p(type);
+        crossunif(type);
         // PMX(type);
 
 
