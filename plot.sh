@@ -1,7 +1,7 @@
 
 #!/usr/bin/gnuplot
 
-set terminal pngcairo
+set terminal pngcairo size 910,640
 
 
 set autoscale
@@ -53,7 +53,8 @@ set key bottom center
 set ylabel "Fitness"
 set output 'output.png'
 
-plot 'data.txt' using 1:2 title 'Média' with linespoints ls 1 pointsize 0, 'data.txt' using 1:3 title 'Maior' with linespoints ls 4 pointsize 0
+plot 'data.txt' using 1:2 title 'Média' with linespoints ls 1 pointsize 0,\
+	 'data.txt' using 1:3 title 'Maior' with linespoints ls 4 pointsize 0
 
 
 
