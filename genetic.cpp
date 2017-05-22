@@ -48,6 +48,17 @@ int bAlternados(int i, char tipo){
     return fitness;
 }
 
+int deceptive(int i){
+    double fitness = 0;
+    for(int j=0; j<ENCSIZE; j++){
+        if(popbin[i][j] == 1)
+            fitness++;
+    }
+    if(fitness == 0)
+        fitness = ENCSIZE + 1;
+    return fitness;
+}
+
 double x2(int i){
     double fitness=0;
     for(int j=0; j<ENCSIZE; j++){
@@ -114,12 +125,51 @@ double nDamas(int i){
     return fitness/ENCSIZE;
 }
 
+double f3(int i){
+    double fitness = 0;
+    if(ENCSIZE%3 != 0){
+        printf("Wrong ENCSIZE for f3\n");
+        exit(0);
+    }
+    int b[3];
+    for(int j = 0; j < ENCSIZE; j+=3){
+        b[0] = (int)popbin[i][j];
+        b[1] = (int)popbin[i][j+1];
+        b[2] = (int)popbin[i][j+2];
+        int dec = binToDecf3(b);
+        if(dec == 0)
+            fitness += 28;
+        else if(dec == 1)
+            fitness += 26;
+        else if(dec == 2)
+            fitness += 22;
+        else if(dec == 3 || dec == 5 || dec == 6)
+            fitness += 0;
+        else if(dec == 4)
+            fitness += 26;
+        else if(dec == 7)
+            fitness += 30;
+    }
+    return fitness/(10*ENCSIZE);
+}
+double f3S(int i){
+    double fitness = 0;
+    return fitness;
+}
+
 int binToDec(int i){
 	int sum=0;
 	for(int j=0; j<ENCSIZE; j++){
 		sum += popbin[i][j]*pow(2, ENCSIZE-j-1);
 	}
 	return sum;
+}
+
+int binToDecf3(int b[]){
+    int sum=0;
+    for(int i=0; i<3; i++)
+        sum += b[i]*pow(2,2-i);
+    return sum;
 }
 
 void mutation(char type){
@@ -421,6 +471,8 @@ void printInt(char tipo){
 }
 
 void init(char tipo){
+    popbin.reserve(POPSIZE);
+    popbInt.reserve(POPSIZE);
     if(tipo =='b'){
         for(int i=0; i<POPSIZE; i++){
             for(int j=0; j<ENCSIZE; j++){
@@ -430,8 +482,6 @@ void init(char tipo){
                     popbin[i].set(j);
             }
         }
-        for(int i=0; i<POPSIZE; i++)
-            popbin[0][i] = 1;
     }
     else if(tipo == 'i'){
         popint.reserve(POPSIZE);
@@ -453,7 +503,8 @@ void init(char tipo){
         }
     }
     else{
-        popdou.reserve(POPSIZE); 
+        popdou.reserve(POPSIZE);
+        popdInt.reserve(POPSIZE);
         for(int i=0; i<POPSIZE; i++){
             for(int j=0; j<ENCSIZE; j++){
                 popdou[i].push_back(distribution(generator));
@@ -497,7 +548,9 @@ void Fitness(char type){//this function fills the fit vector and the sum variabl
     for(int i=0; i<POPSIZE; i++){
 
         if(type == 'b'){
-            fit[i] = pattern(i);
+            // fit[i] = pattern(i);
+            // fit[i] = deceptive(i);
+            fit[i] = f3(i);
             if(fit[i] > outFit){
                 outFit = fit[i];
                 outBin = popbin[i];
@@ -567,7 +620,7 @@ void gapUpdate(char type, int i){
     static int space = (MAXGENS-200)/(GENGAP0+1)*2;
     if(i%space == 0 && i <= MAXGENS-200)
         gap -= 2;
-    printf("it: %d, gap: %d, space: %d\n", i, gap, space);
+    // printf("it: %d, gap: %d, space: %d\n", i, gap, space);
 }
 
 void AG(char type){
@@ -592,16 +645,16 @@ void AG(char type){
         //crossover
         // printInt(type);
         // printf("Crossover\n");
-        // crossover(type);
+        crossover1p(type);
         // crossunif(type);
-        PMX(type);
+        // PMX(type);
 
 
         //mutation
         // printf("Mutation\n");
-        // mutation(type);
+        mutation(type);
         // deltaMutation(type);
-        swapPosition(type);
+        // swapPosition(type);
         
         //elitism
         elitism(type);
