@@ -64,7 +64,7 @@ int deceptive(int i){
             if(j%blocksize==blocksize-1)
                 break;
         }
-        fitness += cont == 0? cont + 1 : cont;
+        fitness += cont == 0? blocksize + 1 : cont;
     }
     return fitness;
 }
@@ -559,8 +559,8 @@ void Fitness(char type){//this function fills the fit vector and the sum variabl
 
         if(type == 'b'){
             // fit[i] = pattern(i);
-            fit[i] = deceptive(i);
-            // fit[i] = f3(i);
+            // fit[i] = deceptive(i);
+            fit[i] = f3(i);
             if(fit[i] > outFit){
                 outFit = fit[i];
                 outBin = popbin[i];
