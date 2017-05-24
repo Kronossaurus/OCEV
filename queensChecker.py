@@ -1,4 +1,12 @@
-file 		= open("teste.txt", "r")
+import sys
+
+argc		= len(sys.argv)
+if argc == 1:
+	filename	= "nQueens.txt"
+else:
+	filename 	= sys.argv[1]
+
+file 		= open(filename, "r")
 n 			= file.readline()
 queens 		= file.	readline().split()
 conflict 	= []
