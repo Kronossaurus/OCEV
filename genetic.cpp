@@ -20,11 +20,11 @@ uniform_real_distribution<double> percentage(0, 100);
 
 void elitism(char tipo){
     for(int i=0; i<ELITISM; i++)
-        if(tipo == 'i')
+        if(tipo == 'i' && find(popint.begin(), popint.end(), outInt) == popint.end())
             popint[i] = outInt;
-        else if(tipo == 'b')
+        else if(tipo == 'b' && find(popbin.begin(), popbin.end(), outBin) == popbin.end())
             popbin[i] = outBin;
-        else
+        else if(find(popdou.begin(), popdou.end(), outDou) == popdou.end())
             popdou[i] = outDou;
 }
 
@@ -162,9 +162,34 @@ double f3(int i){
     }
     return fitness/(10*ENCSIZE);
 }
+
 double f3S(int i){
     double fitness = 0;
-    return fitness;
+    if(ENCSIZE%3 != 0){
+        printf("Wrong ENCSIZE for f3S\n");
+        exit(0);
+    }
+    int b[3];
+    int space = ENCSIZE/3;
+    for(int j = 0; j < ENCSIZE; j+=3){
+        b[0] = (int)popbin[i][j];
+        b[1] = (int)popbin[i][j+space];
+        b[2] = (int)popbin[i][j+2*space];
+        int dec = binToDecf3(b);
+        if(dec == 0)
+            fitness += 28;
+        else if(dec == 1)
+            fitness += 26;
+        else if(dec == 2)
+            fitness += 22;
+        else if(dec == 3 || dec == 5 || dec == 6)
+            fitness += 0;
+        else if(dec == 4)
+            fitness += 26;
+        else if(dec == 7)
+            fitness += 30;
+    }
+    return fitness/(10*ENCSIZE);
 }
 
 int binToDec(int i){
@@ -560,7 +585,8 @@ void Fitness(char type){//this function fills the fit vector and the sum variabl
         if(type == 'b'){
             // fit[i] = pattern(i);
             // fit[i] = deceptive(i);
-            fit[i] = f3(i);
+            // fit[i] = f3(i);
+            fit[i] = f3S(i);
             if(fit[i] > outFit){
                 outFit = fit[i];
                 outBin = popbin[i];
@@ -614,13 +640,13 @@ void FitScaling(int i){
 
 void genShuffle(char type){
     if(type == 'b'){
-        random_shuffle(popbin.begin(), popbin.end());
+        random_shuffle(&popbin[0], &popbin[POPSIZE]);
     }
     else if(type == 'i'){
-        random_shuffle(popint.begin(), popint.end());
+        random_shuffle(&popint[0], &popint[POPSIZE]);
     }
     else{
-        random_shuffle(popdou.begin(), popdou.end());
+        random_shuffle(&popdou[0], &popdou[POPSIZE]);
     }
 }
 
@@ -682,7 +708,7 @@ void AG(char type){
         logMedias(i, div);
         
         //shuffle
-        genShuffle(type);
+        // genShuffle(type);
     }
     printf("Maior Fitness = %.4lf\n", outFit);
     printf("Genótipo do melhor indivíduo =");
